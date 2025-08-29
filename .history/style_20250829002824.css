@@ -1,0 +1,175 @@
+/* --- Estilos generales --- */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
+  display: grid;
+  gap: 2rem;
+  grid-template-areas:
+    "header header"
+    "form search"  /* <-- El buscador ahora está junto al formulario */
+    "list list";   /* <-- La lista de tareas ocupa todo el ancho */
+  grid-template-columns: 1fr 1fr; /* Dividimos el espacio por igual entre formulario y buscador */
+}
+
+h1 {
+  grid-area: header;
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Asignamos las áreas a las tarjetas para posicionarlas */
+#formTarea { grid-area: form; }
+#buscarTareasCard { grid-area: search; }
+#listaTareasCard { grid-area: list; }
+
+/* --- Tarjetas (Diseño de post-it) --- */
+.card {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+h2 {
+  margin-top: 0;
+  color: #34495e;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 0.5rem;
+}
+
+/* --- Inputs y Botones (Sin cambios, mantienen el dinamismo) --- */
+input, textarea, select, button {
+  width: 100%;
+  padding: 12px;
+  margin: 0.5rem 0;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 8px rgba(74, 144, 226, 0.6);
+  transform: scale(1.01);
+}
+
+button {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background: #357ab8;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* --- Estilo de la lista de Tareas (Los "Post-its") --- */
+#listaTareas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0.5); /* Solo la escala */
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1); /* Solo la escala */
+        opacity: 1;
+    }
+}
+
+.tarea {
+    border-left: 8px solid;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+background-color: #fdfdfd;
+    position: relative;
+    animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+}
+
+.tarea:hover {
+    transform: translateY(-5px); /* Solo el movimiento hacia arriba */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Colores por prioridad (se mantienen y se aplican al borde) */
+.tarea.alta { border-left-color: #e74c3c; }
+.tarea.media { border-left-color: #f1c40f; }
+.tarea.baja { border-left-color: #2ecc71; }
+
+.tarea h3 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.tarea small {
+  color: #888;
+  display: block;
+}
+
+#notificaciones {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 9999;
+}
+
+.notificacion {
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateX(100%);
+  animation: mostrar 0.5s forwards, desaparecer 0.5s 3s forwards;
+}
+
+.notificacion.exito { background-color: #2ecc71; }
+.notificacion.error { background-color: #e74c3c; }
+
+@keyframes mostrar {
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes desaparecer {
+  to { opacity: 0; transform: translateX(100%); }
+}

@@ -1,0 +1,94 @@
+/* --- Estilos generales --- */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f0f2f5;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+/* --- Tarjetas --- */
+.card {
+  background: #fff;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+  margin-top: 0;
+  color: #444;
+}
+
+/* --- Inputs --- */
+input, textarea, select, button {
+  width: 100%;
+  padding: 10px;
+  margin: 0.5rem 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 4px rgba(74, 144, 226, 0.4);
+}
+
+/* --- Botones --- */
+button {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #357ab8;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* --- Lista de tareas --- */
+.tarea {
+  border-left: 6px solid #4a90e2;
+  background: #f9f9f9;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border-radius: 8px;
+}
+
+.tarea h3 {
+  margin: 0;
+}
+
+.tarea small {
+  color: #666;
+}
+
+/* Colores por prioridad */
+.tarea.alta { border-left-color: #e74c3c; }
+.tarea.media { border-left-color: #f1c40f; }
+.tarea.baja { border-left-color: #2ecc71; }

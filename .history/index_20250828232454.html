@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestor de Tareas</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; }
+    h1 { text-align: center; }
+    form, .busqueda { margin-bottom: 2rem; }
+    input, select, textarea, button { width: 100%; margin: 0.5rem 0; padding: 8px; }
+    .tarea { border: 1px solid #ccc; padding: 1rem; margin: 0.5rem 0; border-radius: 8px; }
+    .tarea h3 { margin: 0 0 0.5rem 0; }
+  </style>
+</head>
+<body>
+  <h1>📋 Mis Tareas</h1>
+
+  <!-- Formulario para crear tarea -->
+  <form id="formTarea">
+    <input type="text" name="titulo" placeholder="Título" required>
+    <textarea name="descripcion" placeholder="Descripción"></textarea>
+    <select name="prioridad">
+      <option value="baja">Baja</option>
+      <option value="media">Media</option>
+      <option value="alta">Alta</option>
+    </select>
+    <input type="date" name="fecha_vencimiento" required>
+    <button type="submit">Agregar tarea</button>
+  </form>
+
+  <!-- Buscador -->
+  <div class="busqueda">
+    <input type="text" id="buscarTitulo" placeholder="Buscar por título">
+    <input type="date" id="buscarFecha">
+    <button onclick="buscar()">Buscar</button>
+    <button onclick="cargarTareas()">Ver todas</button>
+  </div>
+
+  <h2>Lista de Tareas</h2>
+  <div id="listaTareas"></div>
+
+  <script>
+    // 🔗 Cambiá esta URL si tu API corre en otra máquina o puerto
+    const API = "http://127.0.0.1:8000/tareas";
+
+    async function cargarTareas() {
+      const res = await fetch(API);
+      const tareas = await res.json();
+      mostrarTareas(tareas);
+    }
+
+    function mostrarTareas(tareas) {
+      const div = document.getElementById("listaTareas");
+      div.innerHTML = "";
+      if (tareas.length === 0) {
+        div.innerHTML = "<p>No hay tareas encontradas.</p>";
+        return;
+      }
+      tareas.forEach(t => {
+        div.innerHTML += `
+          <div class="tarea">
+            <h3>${t.titulo} (${t.prioridad})</h3>
+            <p>${t.descripcion || "Sin descripción"}</p>
+            <small>Vence: ${t.fecha_vencimiento}</small>
+          </div>
+        `;
+      });
+    }
+
+    document.getElementById("formTarea").addEventListener("submit", async e => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target).entries());
+      await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      e.target.reset();
+      cargarTareas();
+    });
+
+    async function buscar() {
+      const titulo = document.getElementById("buscarTitulo").value;
+      const fecha = document.getElementById("buscarFecha").value;
+      const params = new URLSearchParams();
+      if (titulo) params.append("titulo", titulo);
+      if (fecha) params.append("fecha", fecha);
+      const res = await fetch(`${API}/buscar?${params.toString()}`);
+      const tareas = await res.json();
+      mostrarTareas(tareas);
+    }
+
+    // Al cargar la página, traemos todas las tareas
+    cargarTareas();
+  </script>
+</body>
+</html>

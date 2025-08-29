@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Tareas</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Gestor de Tareas</h1>
+
+        <form id="formTarea" class="card">
+            <h2>Nueva tarea</h2>
+            <input type="text" name="titulo" placeholder="Título" required>
+            <textarea name="descripcion" placeholder="Descripción"></textarea>
+            <select name="prioridad">
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+            </select>
+            <input type="date" name="fecha_vencimiento" required>
+            <button type="submit">➕ Agregar tarea</button>
+        </form>
+
+        <div class="card" id="buscarTareasCard">
+            <h2>Buscar tareas</h2>
+            <input type="text" id="buscarTitulo" placeholder="Buscar por título">
+            <input type="date" id="buscarFecha">
+            <div class="actions">
+                <button type="button" onclick="buscar()">🔍 Buscar</button>
+                <button type="button" onclick="cargarTareas()">📑 Ver todas</button>
+            </div>
+        </div>
+
+        <div class="card" id="listaTareasCard">
+            <h2>Lista de Tareas</h2>
+            <div id="listaTareas"></div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

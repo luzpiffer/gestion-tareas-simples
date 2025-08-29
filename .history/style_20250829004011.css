@@ -1,0 +1,216 @@
+/* --- Estilos generales --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 1rem;
+    display: grid;
+    gap: 2rem;
+    grid-template-areas:
+        "header header"
+        "form search"
+        "list list";
+    grid-template-columns: 1fr 1fr;
+}
+
+h1 {
+    grid-area: header;
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Asignamos áreas */
+#formTarea { grid-area: form; }
+#buscarTareasCard { grid-area: search; }
+#listaTareasCard { grid-area: list; }
+
+/* --- Tarjetas --- */
+.card {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+h2 {
+    margin-top: 0;
+    color: #34495e;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 0.5rem;
+}
+
+/* Inputs y botones */
+input, textarea, select, button {
+    width: 100%;
+    padding: 12px;
+    margin: 0.5rem 0;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.6);
+    transform: scale(1.01);
+}
+
+button {
+    background: #4a90e2;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background: #357ab8;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* Lista de tareas */
+#listaTareas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.tarea {
+    border-left: 8px solid;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    background-color: #fcf8f8;
+    position: relative;
+    animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards, jiggle 3s ease-in-out infinite;
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Nuevo: Efecto "jiggle" al pasar el mouse y la sombra original */
+.tarea:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Colores por prioridad */
+.tarea.alta { border-left-color: #e74c3c; }
+.tarea.media { border-left-color: #f1c40f; }
+.tarea.baja { border-left-color: #2ecc71; }
+
+.tarea h3 { margin: 0 0 0.5rem 0; color: #333; }
+.tarea small { color: #888; display: block; }
+
+/* Cruz para eliminar */
+.tarea .cerrar {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    cursor: pointer;
+    font-weight: bold;
+    color: #e74c3c;
+    font-size: 1.2rem;
+    transition: color 0.2s ease;
+}
+
+.tarea .cerrar:hover { color: #c0392b; }
+
+/* Notificaciones */
+#notificaciones {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 9999;
+}
+
+.notificacion {
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateX(100%);
+    animation: mostrar 0.5s forwards, desaparecer 0.5s 3s forwards;
+}
+
+.notificacion.exito { background-color: #2ecc71; }
+.notificacion.error { background-color: #e74c3c; }
+
+@keyframes mostrar { to { opacity: 1; transform: translateX(0); } }
+@keyframes desaparecer { to { opacity: 0; transform: translateX(100%); } }
+@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* Nuevo: Animación para el movimiento de las tarjetas */
+@keyframes jiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(0.5deg); }
+    75% { transform: rotate(-0.5deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Estilos del modal de confirmación */
+.confirm-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.confirm-modal {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.confirm-modal p {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 1.5rem;
+}
+
+.confirm-modal .actions {
+    justify-content: center;
+    gap: 1rem;
+}
+
+.confirm-modal button {
+    width: auto;
+    padding: 0.5rem 1.5rem;
+}

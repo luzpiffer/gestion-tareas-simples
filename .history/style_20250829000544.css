@@ -1,0 +1,131 @@
+/* --- Estilos generales --- */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Fondo más degradado */
+  margin: 0;
+  padding: 0;
+  display: flex; /* Centra el contenido */
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 700px;
+  width: 90%; /* Ajuste para móviles */
+  margin: 0; /* Centrado por flexbox */
+  padding: 2rem;
+  animation: fadeIn 1s ease-in-out; /* Animación de entrada */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+  text-align: center;
+  color: #2c3e50; /* Color más oscuro y elegante */
+  margin-bottom: 2rem;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* Sombra sutil para el título */
+}
+
+/* --- Tarjetas --- */
+.card {
+  background: #fff;
+  padding: 2rem; /* Más espacio interno */
+  margin-bottom: 2rem;
+  border-radius: 16px; /* Bordes más redondeados */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1); /* Sombra más pronunciada */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transiciones para el efecto hover */
+}
+
+.card:hover {
+  transform: translateY(-5px); /* Efecto 3D al pasar el cursor */
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15); /* Sombra más grande al hacer hover */
+}
+
+h2 {
+  margin-top: 0;
+  color: #34495e;
+  border-bottom: 2px solid #ecf0f1; /* Línea separadora */
+  padding-bottom: 0.5rem;
+}
+
+/* --- Inputs --- */
+input, textarea, select, button {
+  width: 100%;
+  padding: 12px; /* Más padding para que los campos sean más grandes */
+  margin: 0.5rem 0;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease; /* Transiciones */
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 8px rgba(74, 144, 226, 0.6);
+  transform: scale(1.01); /* Ligero efecto de "pulsación" al enfocar */
+}
+
+textarea {
+  min-height: 120px; /* Más espacio para la descripción */
+  resize: vertical;
+}
+
+/* --- Botones --- */
+button {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 1px; /* Espaciado entre letras */
+  text-transform: uppercase;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background: #357ab8;
+  transform: translateY(-2px); /* Efecto 3D */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.actions {
+  display: flex;
+  gap: 1rem; /* Más separación entre botones */
+}
+
+/* --- Lista de tareas (Con nuevos efectos) --- */
+.tarea {
+  border-left: 8px solid; /* Borde más grueso */
+  background: #fdfdfd;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tarea:hover {
+  transform: translateX(10px); /* Efecto de "deslizamiento" */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.tarea h3 {
+  margin: 0;
+  color: #333;
+}
+
+.tarea small {
+  color: #888;
+  display: block; /* Ocupa su propia línea */
+  margin-top: 0.5rem;
+}
+
+/* Colores por prioridad */
+.tarea.alta { border-left-color: #e74c3c; } /* Rojo */
+.tarea.media { border-left-color: #f1c40f; } /* Amarillo */
+.tarea.baja { border-left-color: #2ecc71; } /* Verde */
