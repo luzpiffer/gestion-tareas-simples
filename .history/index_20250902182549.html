@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Tareas con Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="notificaciones"></div>
+
+    <div id="loginContainer">
+        <div class="login-form-side">
+            <div class="flip-card-container">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <h1 id="login-heading">Inicia Sesión</h1>
+                        <form id="loginForm" class="card">
+                            <input type="text" id="username" placeholder="Email Address:" required>
+                            <input type="password" id="password" placeholder="Password:" required>
+                            <div class="forgot-remember">
+                                <label>
+                                    <input type="checkbox" class="checkbox"> Recordarme
+                                </label>
+                                <a href="#">¿Olvidaste tu contraseña?</a>
+                            </div>
+                            <button type="submit" class="login-button">Ingresar</button>
+                        </form>
+                        <div class="social-login">
+                            <p>o conéctate con</p>
+                            <div class="social-icons">
+                                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#"><i class="fab fa-google"></i></a>
+                            </div>
+                        </div>
+                        <div class="signup-link">
+                            ¿No tienes una cuenta? <a href="#" id="showRegistro">Regístrate</a>
+                        </div>
+                    </div>
+
+                    <div class="flip-card-back">
+                        <h1 id="register-heading">Regístrate</h1>
+                        <form id="registroForm" class="card">
+                            <input type="text" id="regUsername" placeholder="Nombre de Usuario" required>
+                            <input type="password" id="regPassword" placeholder="Contraseña" required>
+                            <button type="submit" class="login-button">Registrar</button>
+                        </form>
+                        <div class="social-login">
+                            <p>o regístrate con</p>
+                            <div class="social-icons">
+                                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#"><i class="fab fa-google"></i></a>
+                            </div>
+                        </div>
+                        <div class="login-link">
+                            ¿Ya tienes una cuenta? <a href="#" id="showLogin">Inicia sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-info-side">
+            <h2>Circle</h2>
+            <p>Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor desconocido usó una galería de textos y los mezcló.</p>
+            <div class="promo-buttons">
+                <button class="promo-button">Saber Más</button>
+                <button class="promo-button play"><i class="fas fa-play"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="tareasContainer" style="display:none;">
+        <button id="logoutBtn">Cerrar sesión</button>
+        <h1>Gestor de Tareas</h1>
+        
+        <form id="formTarea" class="card">
+            <h2>Nueva tarea</h2>
+            <input type="text" name="titulo" placeholder="Título" required>
+            <textarea name="descripcion" placeholder="Descripción"></textarea>
+            <select name="prioridad" required>
+                <option value="" disabled selected>Prioridad de la tarea</option>
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+            </select>
+            <input type="date" name="fecha_vencimiento" required id="fecha_vencimiento">
+            <button type="submit">Agregar tarea</button>
+        </form>
+
+        <div class="card" id="buscarTareasCard">
+            <h2>Buscar tareas</h2>
+            <input type="text" id="buscarTitulo" placeholder="Buscar por título">
+            <input type="date" id="buscarFecha">
+            <div class="actions">
+                <button type="button" onclick="buscar()">Buscar</button>
+                <button type="button" onclick="cargarTareas()">Ver todas</button>
+                <button type="button" onclick="limpiarBusqueda()">Limpiar</button>
+            </div>
+        </div>
+
+        <div class="card" id="listaTareasCard">
+            <h2>Lista de Tareas</h2>
+            <div id="listaTareas"></div>
+        </div>
+    </div>
+    
+    <script src="/static/app.js"></script>
+</body>
+</html>

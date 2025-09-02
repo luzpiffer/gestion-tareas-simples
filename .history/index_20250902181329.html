@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - Gestor de Tareas</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="notificaciones"></div>
+
+    <!-- Login Container -->
+    <div class="login-wrapper" id="loginContainer">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="logo">
+                    <span class="logo-icon">📋</span>
+                    <h1>TaskFlow</h1>
+                </div>
+                <p class="subtitle">Organiza tu día de manera inteligente</p>
+            </div>
+
+            <div class="auth-forms">
+                <div class="form-card">
+                    <h2>Iniciar Sesión</h2>
+                    <form id="loginForm">
+                        <div class="input-group">
+                            <input type="text" id="username" placeholder="Usuario" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="password" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="btn-primary">Ingresar</button>
+                    </form>
+                </div>
+
+                <div class="form-card">
+                    <h2>Crear Cuenta</h2>
+                    <form id="registroForm">
+                        <div class="input-group">
+                            <input type="text" id="regUsername" placeholder="Usuario" required>
+                        </div>
+                        <div class="input-group">
+                            <input type="password" id="regPassword" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="btn-secondary">Registrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container" id="tareasContainer" style="display:none;">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">📋</span>
+                    <h1>TaskFlow</h1>
+                </div>
+                <div class="header-actions">
+                    <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="user-profile">
+                    <div class="avatar">👤</div>
+                    <div class="user-info">
+                        <h3 id="userName">Usuario</h3>
+                        <p>Gestor de tareas</p>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="#" class="nav-item active">
+                        <span class="nav-icon">📝</span>
+                        Mis Tareas
+                    </a>
+                    <a href="#" class="nav-item">
+                        <span class="nav-icon">⭐</span>
+                        Favoritas
+                    </a>
+                    <a href="#" class="nav-item">
+                        <span class="nav-icon">⚙️</span>
+                        Configuración
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Nueva Tarea -->
+                <section class="content-card">
+                    <h2>Nueva Tarea</h2>
+                    <form id="formTarea" class="task-form">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <input type="text" name="titulo" placeholder="Título de la tarea" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <textarea name="descripcion" placeholder="Descripción (opcional)" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="input-group">
+                                <select name="prioridad" required>
+                                    <option value="" disabled selected>Seleccionar prioridad</option>
+                                    <option value="baja">🟢 Baja</option>
+                                    <option value="media">🟡 Media</option>
+                                    <option value="alta">🔴 Alta</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <input type="date" name="fecha_vencimiento" required id="fecha_vencimiento">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary">Agregar Tarea</button>
+                    </form>
+                </section>
+
+                <!-- Buscar Tareas -->
+                <section class="content-card">
+                    <h2>Buscar Tareas</h2>
+                    <div class="search-form">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <input type="text" id="buscarTitulo" placeholder="Buscar por título">
+                            </div>
+                            <div class="input-group">
+                                <input type="date" id="buscarFecha">
+                            </div>
+                        </div>
+                        <div class="search-actions">
+                            <button type="button" onclick="buscar()" class="btn-primary">Buscar</button>
+                            <button type="button" onclick="cargarTareas()" class="btn-secondary">Ver todas</button>
+                            <button type="button" onclick="limpiarBusqueda()" class="btn-outline">Limpiar</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Lista de Tareas -->
+                <section class="content-card tasks-section">
+                    <h2>Mis Tareas</h2>
+                    <div id="listaTareas" class="tasks-grid"></div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
+

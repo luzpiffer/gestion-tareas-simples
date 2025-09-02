@@ -1,0 +1,551 @@
+/* --- Variables de colores --- */
+:root {
+    /* Colores del fondo general */
+    --bg-color-start: #f0f0f5;
+    --bg-color-end: #e0e0eb;
+    
+    /* Gradientes principales para el login/registro */
+    --login-gradient-dark: linear-gradient(to right, #8a4bff, #d8436e);
+    --login-gradient-light: linear-gradient(to right, #aa75ff, #ff758c);
+
+    /* Colores para el efecto de "frosted glass" (Gestor de Tareas) */
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass-shadow: rgba(0, 0, 0, 0.1);
+
+    /* Colores de texto y botones (Gestor de Tareas) */
+    --text-dark: #333;
+    --text-light: #666;
+    --text-heading: #2d2d2d;
+    --primary-button: linear-gradient(45deg, #aa75ff, #8a4bff);
+    --primary-button-hover: linear-gradient(45deg, #9960e6, #7a30e6);
+    --input-bg-tasks: rgba(255, 255, 255, 0.8);
+    --input-border-focus-tasks: #aa75ff;
+
+    /* Colores de prioridad (Gestor de Tareas) */
+    --priority-high: #f06292;
+    --priority-medium: #ffd54f;
+    --priority-low: #66bb6a;
+
+    /* Colores específicos del nuevo Login/Registro */
+    --auth-input-bg: #eee;
+    --auth-input-focus: #aa75ff;
+    --auth-button-text: white;
+    --auth-button-bg: #8a4bff;
+    --auth-button-hover-bg: #7a30e6;
+    --ghost-button-border: white;
+    --ghost-button-hover-bg: rgba(255, 255, 255, 0.2);
+    --auth-text-color: #333;
+    --auth-link-color: #8a4bff;
+}
+
+/* --- Estilos generales --- */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--bg-color-start) 0%, var(--bg-color-end) 100%);
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+    color: var(--text-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* --- Estilos del contenedor de autenticación (Login/Registro) --- */
+#authContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+#mainContainer {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    position: relative;
+    overflow: hidden;
+    width: 768px;
+    max-width: 100%;
+    min-height: 480px;
+}
+
+.auth-panel {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    transition: transform 0.6s ease-in-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 0 50px;
+    text-align: center;
+    background-color: #fff;
+}
+
+.left-panel {
+    left: 0;
+    transform: translateX(-100%);
+}
+
+.right-panel {
+    right: 0;
+    transform: translateX(100%);
+}
+
+#mainContainer.right-panel-active .left-panel {
+    transform: translateX(0);
+}
+
+#mainContainer.right-panel-active .right-panel {
+    transform: translateX(0);
+}
+
+.auth-panel.active {
+    transform: translateX(0);
+}
+
+/* Estilos de los formularios dentro de los paneles */
+.auth-panel form {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 50px;
+    height: 100%;
+    text-align: center;
+    width: 100%;
+}
+
+.auth-panel h1 {
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: var(--auth-text-color);
+    font-size: 2.2em; /* Ajuste para el tamaño de los títulos del formulario */
+}
+
+.auth-panel p {
+    font-size: 14px;
+    font-weight: 100;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 15px 0 20px;
+    color: var(--auth-text-color);
+}
+
+.input-group {
+    background-color: var(--auth-input-bg);
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    padding: 10px 15px;
+    border-radius: 50px;
+    width: 100%;
+}
+
+.input-group i {
+    color: #999;
+    margin-right: 10px;
+}
+
+.input-group input {
+    background: transparent;
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--auth-text-color);
+}
+
+.input-group input:focus {
+    box-shadow: none;
+}
+
+.forgot-password {
+    color: var(--auth-link-color);
+    font-size: 12px;
+    text-decoration: none;
+    margin: 15px 0;
+}
+
+.panel-switch-text {
+    font-size: 12px;
+    color: #999;
+    margin-top: 20px;
+}
+
+.auth-button {
+    border-radius: 20px;
+    border: 1px solid var(--auth-button-bg);
+    background-color: var(--auth-button-bg);
+    color: var(--auth-button-text);
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+.auth-button:active {
+    transform: scale(0.95);
+}
+
+.auth-button:focus {
+    outline: none;
+}
+
+.ghost-button {
+    background-color: transparent;
+    border-color: var(--ghost-button-border);
+    border-radius: 20px;
+    border: 1px solid var(--ghost-button-border);
+    color: var(--ghost-button-border);
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.ghost-button:hover {
+    background-color: var(--ghost-button-hover-bg);
+    color: white;
+}
+
+/* --- Contenedor del overlay (el que se desliza por encima) --- */
+.overlay-container {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 100;
+}
+
+#mainContainer.right-panel-active .overlay-container {
+    transform: translateX(-100%);
+}
+
+.overlay {
+    background: var(--login-gradient-dark);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 0 0;
+    color: #FFFFFF;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+#mainContainer.right-panel-active .overlay {
+    transform: translateX(50%);
+}
+
+/* --- Paneles individuales dentro del overlay --- */
+.overlay-panel {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    padding: 0 40px; /* Ajuste el padding para dar más espacio al texto */
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+/* Ajustes para el texto dentro de los overlay-panel */
+.overlay-panel h1 {
+    font-weight: bold;
+    margin: 0 0 15px; /* Más espacio abajo */
+    color: white;
+    font-size: 2.7em; /* Un poco más grande para darle más impacto */
+    line-height: 1.2;
+}
+
+.overlay-panel p {
+    font-size: 16px; /* Aumentado para mejor legibilidad */
+    font-weight: 100;
+    line-height: 1.5; /* Mayor interlineado */
+    letter-spacing: 0.5px;
+    margin: 10px 0 20px;
+    color: rgba(255, 255, 255, 0.85); /* Ligeramente menos transparente */
+    max-width: 300px; /* Limita el ancho del texto para mejor lectura */
+}
+
+
+.overlay-left {
+    transform: translateX(-20%);
+}
+
+#mainContainer.right-panel-active .overlay-left {
+    transform: translateX(0);
+}
+
+.overlay-right {
+    right: 0;
+    transform: translateX(0);
+}
+
+#mainContainer.right-panel-active .overlay-right {
+    transform: translateX(20%);
+}
+
+/* --- Estilos del GESTOR DE TAREAS --- */
+#tareasContainer {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    display: grid;
+    gap: 2rem;
+    grid-template-areas:
+        "header header"
+        "form search"
+        "list list";
+    grid-template-columns: 1fr 1fr;
+    background: var(--glass-bg);
+    border-radius: 25px;
+    box-shadow: 0 10px 40px 0 var(--glass-shadow);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s ease-in-out;
+}
+
+#tareasContainer button#logoutBtn {
+    background: linear-gradient(45deg, #f06292, #e91e63);
+    margin-top: 0;
+    width: auto;
+    padding: 10px 25px;
+    border-radius: 10px;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+#tareasContainer button#logoutBtn:hover {
+    background: linear-gradient(45deg, #d8436e, #c2185b);
+    transform: translateY(-2px);
+}
+
+#tareasContainer h1 {
+    grid-area: header;
+    text-align: center;
+    background: var(--login-gradient-light);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 3em;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+.container .card {
+    background: var(--glass-bg);
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 8px 32px 0 var(--glass-shadow);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px var(--glass-shadow);
+}
+
+.container .card h2 {
+    margin-top: 0;
+    color: var(--text-heading);
+    border-bottom: 2px solid var(--glass-border);
+    padding-bottom: 0.8rem;
+    font-size: 1.8em;
+    font-weight: 600;
+}
+
+#tareasContainer form button {
+    width: 100%;
+    padding: 15px;
+    margin: 1rem 0 0.5rem 0;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: white;
+    background: var(--primary-button);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+#tareasContainer form button:hover {
+    background: var(--primary-button-hover);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+#formTarea { grid-area: form; }
+#buscarTareasCard { grid-area: search; }
+#listaTareasCard { grid-area: list; }
+
+.actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.actions button {
+    flex: 1;
+    margin: 0;
+    padding: 12px;
+    font-size: 0.95rem;
+}
+
+#listaTareas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.tarea {
+    border-left: 10px solid;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255, 0.7);
+    position: relative;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.tarea:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+}
+
+.tarea.alta { border-left-color: var(--priority-high); }
+.tarea.media { border-left-color: var(--priority-medium); }
+.tarea.baja { border-left-color: var(--priority-low); }
+
+.tarea h3 { margin: 0 0 0.75rem 0; color: var(--text-heading); font-size: 1.4em; }
+.tarea small { color: var(--text-light); display: block; font-size: 0.9em; margin-top: 0.5rem;}
+
+.tarea .cerrar {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--priority-high);
+    font-size: 1.3rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.tarea .cerrar:hover {
+    color: #d8436e;
+    transform: scale(1.1);
+}
+
+#notificaciones {
+    position: fixed;
+    top: 1.5rem;
+    right: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    z-index: 9999;
+}
+
+.notificacion {
+    padding: 1rem 1.75rem;
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateX(100%);
+    animation: mostrar 0.5s forwards, desaparecer 0.5s 3s forwards;
+}
+
+.notificacion.exito { background-color: var(--priority-low); }
+.notificacion.error { background-color: var(--priority-high); }
+
+@keyframes mostrar { to { opacity: 1; transform: translateX(0); } }
+@keyframes desaparecer { to { opacity: 0; transform: translateX(100%); } }
+@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+.confirm-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.confirm-modal {
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 3rem;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 15px 40px var(--glass-shadow);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.confirm-modal p {
+    font-size: 1.3rem;
+    color: var(--text-dark);
+    margin-bottom: 2rem;
+}
+
+.confirm-modal .actions {
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.confirm-modal button {
+    width: auto;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}

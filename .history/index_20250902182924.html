@@ -14,14 +14,13 @@
 
     <div id="authContainer">
         <div id="mainContainer">
-            
             <div id="loginPanel" class="auth-panel left-panel active">
                 <div class="panel-content">
                     <h1>Inicia Sesión</h1>
                     <form id="loginForm">
                         <div class="input-group">
                             <i class="fas fa-user"></i>
-                            <input type="text" id="username" placeholder="Usuario" required>
+                            <input type="text" id="username" placeholder="Usuario o Email" required>
                         </div>
                         <div class="input-group">
                             <i class="fas fa-lock"></i>
@@ -44,6 +43,10 @@
                             <input type="text" id="regUsername" placeholder="Nombre de Usuario" required>
                         </div>
                         <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="regEmail" placeholder="Email" required>
+                        </div>
+                        <div class="input-group">
                             <i class="fas fa-lock"></i>
                             <input type="password" id="regPassword" placeholder="Contraseña" required>
                         </div>
@@ -54,23 +57,20 @@
                 </div>
             </div>
 
-            <div class="overlay-container">
-                <div class="overlay">
-                    <div class="overlay-panel overlay-left">
-                        <h1>¡Hola amigo!</h1>
-                        <p>Ingresa tus datos personales y comienza a organizar tus tareas.</p>
-                        <button class="ghost-button" id="signInButton">Ingresar</button>
-                    </div>
-                    <div class="overlay-panel overlay-right">
-                        <h1>¡Bienvenido de Nuevo!</h1>
-                        <p>Para mantenerte conectado, por favor inicia sesión con tu información personal.</p>
-                        <button class="ghost-button" id="signUpButton">Regístrate</button>
-                    </div>
-                </div>
+            <div class="overlay-panel left-overlay" id="overlayLeft">
+                <h1>¡Bienvenido de Nuevo!</h1>
+                <p>Para mantenerte conectado con nosotros, por favor inicia sesión con tu información personal.</p>
+                <button class="ghost-button" id="signInButton">Ingresar</button>
+            </div>
+
+            <div class="overlay-panel right-overlay" id="overlayRight">
+                <h1>¡Hola, Amigo!</h1>
+                <p>Ingresa tus datos personales y comienza tu viaje con nosotros.</p>
+                <button class="ghost-button" id="signUpButton">Registrar</button>
             </div>
         </div>
     </div>
-    
+
     <div class="container" id="tareasContainer" style="display:none;">
         <button id="logoutBtn">Cerrar sesión</button>
         <h1>Gestor de Tareas</h1>

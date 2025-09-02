@@ -15,10 +15,9 @@ function mostrarNotificacion(mensaje, tipo="exito") {
 const mainContainer = document.getElementById('mainContainer');
 const showRegisterPanelBtn = document.getElementById('showRegisterPanel');
 const showLoginPanelBtn = document.getElementById('showLoginPanel');
-const signInButton = document.getElementById('signInButton');
-const signUpButton = document.getElementById('signUpButton');
+const signInButton = document.getElementById('signInButton'); // Corregido ID
+const signUpButton = document.getElementById('signUpButton'); // Corregido ID
 
-// Los botones dentro de los paneles de formulario
 showRegisterPanelBtn.addEventListener('click', () => {
     mainContainer.classList.add("right-panel-active");
 });
@@ -27,7 +26,7 @@ showLoginPanelBtn.addEventListener('click', () => {
     mainContainer.classList.remove("right-panel-active");
 });
 
-// Los botones "fantasmas" del overlay
+// Event listeners para los botones del overlay (por si se usan)
 signInButton.addEventListener('click', () => {
     mainContainer.classList.remove("right-panel-active");
 });
@@ -51,8 +50,8 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
     if(res.ok){
         const resp = await res.json();
         currentUserId = resp.user_id;
-        document.getElementById("authContainer").style.display = "none";
-        document.getElementById("tareasContainer").style.display = "grid";
+        document.getElementById("authContainer").style.display = "none"; // Oculta el contenedor de auth
+        document.getElementById("tareasContainer").style.display = "grid"; // Muestra el gestor de tareas
         mostrarNotificacion("Bienvenido/a "+username, "exito");
         cargarTareas();
     } else {
@@ -65,12 +64,12 @@ document.getElementById("registroForm").addEventListener("submit", async e => {
     e.preventDefault();
     const username = document.getElementById("regUsername").value;
     const password = document.getElementById("regPassword").value;
-    const email = document.getElementById("regEmail").value;
+    const email = document.getElementById("regEmail").value; // Asumiendo que también hay un input para email
 
     const res = await fetch("/registro", {
         method:"POST",
         headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({username, email, password})
+        body: JSON.stringify({username, email, password}) // Incluye email si lo usas
     });
 
     if(res.ok){
@@ -78,7 +77,7 @@ document.getElementById("registroForm").addEventListener("submit", async e => {
         document.getElementById("regUsername").value="";
         document.getElementById("regEmail").value="";
         document.getElementById("regPassword").value="";
-        mainContainer.classList.remove("right-panel-active");
+        mainContainer.classList.remove("right-panel-active"); // Vuelve al panel de login
     } else {
         const err = await res.json();
         mostrarNotificacion(err.detail || "Error al registrar", "error");
@@ -89,8 +88,8 @@ document.getElementById("registroForm").addEventListener("submit", async e => {
 document.getElementById("logoutBtn").addEventListener("click", () => {
     currentUserId = null;
     document.getElementById("tareasContainer").style.display="none";
-    document.getElementById("authContainer").style.display="flex";
-    mainContainer.classList.remove("right-panel-active");
+    document.getElementById("authContainer").style.display="flex"; // Vuelve a mostrar el contenedor de auth
+    mainContainer.classList.remove("right-panel-active"); // Asegura que el login esté en el estado inicial
 });
 
 // --- Fecha mínima ---

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Tareas con Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="notificaciones"></div>
+
+    <div id="loginContainer">
+        <div class="login-form-side">
+            <h1 id="login-heading">Log In on Circle</h1>
+            
+            <form id="loginForm" class="card">
+                <input type="text" id="username" placeholder="Email Address:" required>
+                <input type="password" id="password" placeholder="Password:" required>
+                <div class="forgot-remember">
+                    <label>
+                        <input type="checkbox" class="checkbox"> Remember me
+                    </label>
+                    <a href="#">Forgot password?</a>
+                </div>
+                <button type="submit" class="login-button">Log in</button>
+            </form>
+
+            <div class="social-login">
+                <p>or connect with</p>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-google"></i></a>
+                </div>
+            </div>
+
+            <div class="signup-link">
+                Don't have an account? <a href="#" id="showRegistro">Sign up</a>
+            </div>
+            
+            <form id="registroForm" class="card" style="display:none;">
+                <input type="text" id="regUsername" placeholder="Username" required>
+                <input type="password" id="regPassword" placeholder="Password" required>
+                <button type="submit" class="login-button">Register</button>
+            </form>
+        </div>
+
+        <div class="login-info-side">
+            <h2>Circle</h2>
+            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+            <div class="promo-buttons">
+                <button class="promo-button">Learn More</button>
+                <button class="promo-button play"><i class="fas fa-play"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" id="tareasContainer" style="display:none;">
+        <button id="logoutBtn">Cerrar sesión</button>
+        <h1>Gestor de Tareas</h1>
+        
+        <form id="formTarea" class="card">
+            <h2>Nueva tarea</h2>
+            <input type="text" name="titulo" placeholder="Título" required>
+            <textarea name="descripcion" placeholder="Descripción"></textarea>
+            <select name="prioridad" required>
+                <option value="" disabled selected>Prioridad de la tarea</option>
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+            </select>
+            <input type="date" name="fecha_vencimiento" required id="fecha_vencimiento">
+            <button type="submit">Agregar tarea</button>
+        </form>
+
+        <div class="card" id="buscarTareasCard">
+            <h2>Buscar tareas</h2>
+            <input type="text" id="buscarTitulo" placeholder="Buscar por título">
+            <input type="date" id="buscarFecha">
+            <div class="actions">
+                <button type="button" onclick="buscar()">Buscar</button>
+                <button type="button" onclick="cargarTareas()">Ver todas</button>
+                <button type="button" onclick="limpiarBusqueda()">Limpiar</button>
+            </div>
+        </div>
+
+        <div class="card" id="listaTareasCard">
+            <h2>Lista de Tareas</h2>
+            <div id="listaTareas"></div>
+        </div>
+    </div>
+    
+    <script src="/static/app.js"></script>
+</body>
+</html>
+

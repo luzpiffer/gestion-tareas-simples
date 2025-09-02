@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Tareas con Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="notificaciones"></div>
+
+    <!-- Login -->
+    <div class="container" id="loginContainer">
+        <h1>Login</h1>
+        <form id="loginForm" class="card">
+            <input type="text" id="username" placeholder="Usuario" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <button type="submit">Ingresar</button>
+        </form>
+        <form id="registroForm" class="card">
+            <h3>Registrar nuevo usuario</h3>
+            <input type="text" id="regUsername" placeholder="Usuario" required>
+            <input type="password" id="regPassword" placeholder="Contraseña" required>
+            <button type="submit">Registrar</button>
+        </form>
+    </div>
+
+    <!-- Gestor de tareas -->
+    <div class="container" id="tareasContainer" style="display:none;">
+        <h1>Gestor de Tareas</h1>
+        <button id="logoutBtn">Cerrar sesión</button>
+
+        <!-- Formulario de nueva tarea -->
+        <form id="formTarea" class="card">
+            <h2>Nueva tarea</h2>
+            <input type="text" name="titulo" placeholder="Título" required>
+            <textarea name="descripcion" placeholder="Descripción"></textarea>
+            <select name="prioridad" required>
+                <option value="" disabled selected>Prioridad de la tarea</option>
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+            </select>
+            <input type="date" name="fecha_vencimiento" required id="fecha_vencimiento">
+            <button type="submit">Agregar tarea</button>
+        </form>
+
+        <!-- Buscador de tareas -->
+        <div class="card" id="buscarTareasCard">
+            <h2>Buscar tareas</h2>
+            <input type="text" id="buscarTitulo" placeholder="Buscar por título">
+            <input type="date" id="buscarFecha">
+            <div class="actions">
+                <button type="button" onclick="buscar()">Buscar</button>
+                <button type="button" onclick="cargarTareas()">Ver todas</button>
+                <button type="button" onclick="limpiarBusqueda()">Limpiar</button>
+            </div>
+        </div>
+
+        <!-- Lista de tareas -->
+        <div class="card" id="listaTareasCard">
+            <h2>Lista de Tareas</h2>
+            <div id="listaTareas"></div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
+

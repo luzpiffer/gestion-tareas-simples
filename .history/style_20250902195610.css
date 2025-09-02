@@ -1,19 +1,15 @@
 /* --- Variables de colores --- */
 :root {
-    /* Colores del fondo general */
     --bg-color-start: #f0f0f5;
     --bg-color-end: #e0e0eb;
-    
-    /* Gradientes principales para el login/registro */
+
     --login-gradient-dark: linear-gradient(to right, #8a4bff, #d8436e);
     --login-gradient-light: linear-gradient(to right, #aa75ff, #ff758c);
 
-    /* Colores para el efecto de "frosted glass" (Gestor de Tareas) */
     --glass-bg: rgba(255, 255, 255, 0.6);
     --glass-border: rgba(255, 255, 255, 0.4);
     --glass-shadow: rgba(0, 0, 0, 0.15);
 
-    /* Colores de texto y botones (Gestor de Tareas) */
     --text-dark: #333;
     --text-light: #666;
     --text-heading: #2d2d2d;
@@ -22,12 +18,10 @@
     --input-bg-tasks: rgba(255, 255, 255, 0.8);
     --input-border-focus-tasks: #aa75ff;
 
-    /* Colores de prioridad (Gestor de Tareas) */
     --priority-high: #f06292;
     --priority-medium: #ffd54f;
     --priority-low: #66bb6a;
 
-    /* Colores específicos del nuevo Login/Registro */
     --auth-input-bg: #eee;
     --auth-input-focus: #aa75ff;
     --auth-button-text: white;
@@ -98,12 +92,27 @@ body {
     background-color: #fff;
 }
 
-.left-panel { left: 0; transform: translateX(0); }
-.right-panel { left: 50%; transform: translateX(0); }
+.left-panel {
+    left: 0;
+    transform: translateX(0);
+}
 
-#mainContainer.right-panel-active .left-panel { transform: translateX(100%); }
-#mainContainer.right-panel-active .right-panel { transform: translateX(100%); }
-.auth-panel.active { transform: translateX(0); }
+.right-panel {
+    left: 50%;
+    transform: translateX(0);
+}
+
+#mainContainer.right-panel-active .left-panel {
+    transform: translateX(100%);
+}
+
+#mainContainer.right-panel-active .right-panel {
+    transform: translateX(100%);
+}
+
+.auth-panel.active {
+    transform: translateX(0);
+}
 
 /* Formularios */
 .auth-panel form {
@@ -249,62 +258,25 @@ body {
 .overlay-panel h1 { font-size: 2.5em; margin-bottom: 15px; color: #fff; }
 .overlay-panel p { font-size: 16px; color: rgba(255,255,255,0.9); margin-bottom: 25px; line-height: 1.4; }
 
-
-/* --- GESTOR DE TAREAS CORREGIDO --- */
+/* --- Gestor de Tareas --- */
 #tareasContainer {
     max-width: 1200px;
     margin: 2rem auto;
     padding: 2rem;
     display: grid;
     gap: 2rem;
-    grid-template-columns: 1fr 1fr;
     grid-template-areas:
         "header header"
         "form search"
         "list list";
+    grid-template-columns: 1fr 1fr;
     background: var(--glass-bg);
     border-radius: 25px;
     box-shadow: 0 12px 40px var(--glass-shadow);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
-    position: relative; /* Agregado para posicionar el botón de forma absoluta */
-}
-
-/* Título y botón de cerrar sesión */
-#tareasContainer h1 {
-    grid-area: header;
-    text-align: center;
-    background: var(--login-gradient-light);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-size: 3em;
-    font-weight: 700;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-    margin: 0; /* Eliminado el margin-bottom para controlarlo con el grid */
-}
-
-#tareasContainer button#logoutBtn {
-    grid-area: logout; /* Asignado a un área de grid que no existe para sacarlo del flujo */
-    background: linear-gradient(45deg, #f06292, #e91e63);
-    color: white;
-    width: auto;
-    padding: 10px 25px;
-    border-radius: 10px;
-    position: absolute; /* Posicionamiento absoluto */
-    top: 20px;
-    right: 20px;
-    z-index: 10;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
-    border: none;
-    cursor: pointer;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-
-#tareasContainer button#logoutBtn:hover {
-    background: linear-gradient(45deg, #d8436e, #c2185b);
-    transform: translateY(-2px);
+    transition: all 0.3s ease-in-out;
 }
 
 /* Cards */
@@ -330,11 +302,6 @@ body {
     font-size: 1.8em;
     font-weight: 600;
 }
-
-/* Asignación de áreas a las tarjetas */
-#formTarea { grid-area: form; }
-#buscarTareasCard { grid-area: search; }
-#listaTareasCard { grid-area: list; }
 
 /* Tareas */
 .tarea {

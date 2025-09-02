@@ -11,32 +11,6 @@ function mostrarNotificacion(mensaje, tipo="exito") {
     setTimeout(() => div.remove(), 3500);
 }
 
-// --- Lógica de cambio de paneles de Login/Registro ---
-const mainContainer = document.getElementById('mainContainer');
-const showRegisterPanelBtn = document.getElementById('showRegisterPanel');
-const showLoginPanelBtn = document.getElementById('showLoginPanel');
-const signInButton = document.getElementById('signInButton');
-const signUpButton = document.getElementById('signUpButton');
-
-// Los botones dentro de los paneles de formulario
-showRegisterPanelBtn.addEventListener('click', () => {
-    mainContainer.classList.add("right-panel-active");
-});
-
-showLoginPanelBtn.addEventListener('click', () => {
-    mainContainer.classList.remove("right-panel-active");
-});
-
-// Los botones "fantasmas" del overlay
-signInButton.addEventListener('click', () => {
-    mainContainer.classList.remove("right-panel-active");
-});
-
-signUpButton.addEventListener('click', () => {
-    mainContainer.classList.add("right-panel-active");
-});
-
-
 // --- Login ---
 document.getElementById("loginForm").addEventListener("submit", async e => {
     e.preventDefault();
@@ -51,8 +25,8 @@ document.getElementById("loginForm").addEventListener("submit", async e => {
     if(res.ok){
         const resp = await res.json();
         currentUserId = resp.user_id;
-        document.getElementById("authContainer").style.display = "none";
-        document.getElementById("tareasContainer").style.display = "grid";
+        document.getElementById("loginContainer").style.display = "none";
+        document.getElementById("tareasContainer").style.display = "block";
         mostrarNotificacion("Bienvenido/a "+username, "exito");
         cargarTareas();
     } else {
@@ -65,20 +39,17 @@ document.getElementById("registroForm").addEventListener("submit", async e => {
     e.preventDefault();
     const username = document.getElementById("regUsername").value;
     const password = document.getElementById("regPassword").value;
-    const email = document.getElementById("regEmail").value;
 
     const res = await fetch("/registro", {
         method:"POST",
         headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({username, email, password})
+        body: JSON.stringify({username, password})
     });
 
     if(res.ok){
         mostrarNotificacion("Usuario registrado ✅", "exito");
         document.getElementById("regUsername").value="";
-        document.getElementById("regEmail").value="";
         document.getElementById("regPassword").value="";
-        mainContainer.classList.remove("right-panel-active");
     } else {
         const err = await res.json();
         mostrarNotificacion(err.detail || "Error al registrar", "error");
@@ -89,8 +60,7 @@ document.getElementById("registroForm").addEventListener("submit", async e => {
 document.getElementById("logoutBtn").addEventListener("click", () => {
     currentUserId = null;
     document.getElementById("tareasContainer").style.display="none";
-    document.getElementById("authContainer").style.display="flex";
-    mainContainer.classList.remove("right-panel-active");
+    document.getElementById("loginContainer").style.display="block";
 });
 
 // --- Fecha mínima ---
