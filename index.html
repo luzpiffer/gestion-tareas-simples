@@ -1,11 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Gestor de Tareas con Login</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
+    <style>
+        /* Estilo para tareas completadas */
+        .tarea.completada h3,
+        .tarea.completada p {
+            text-decoration: line-through;
+            color: gray;
+            opacity: 0.7;
+        }
+    </style>
+
     <div id="notificaciones"></div>
 
     <!-- Login -->
@@ -29,6 +41,7 @@
         <h1>Gestor de Tareas</h1>
         <button id="logoutBtn">Cerrar sesión</button>
 
+
         <!-- Formulario de nueva tarea -->
         <form id="formTarea" class="card">
             <h2>Nueva tarea</h2>
@@ -40,6 +53,11 @@
                 <option value="media">Media</option>
                 <option value="alta">Alta</option>
             </select>
+            <select name="categorias" multiple>
+                <!-- JS lo llenará automáticamente -->
+            </select>
+
+
             <input type="date" name="fecha_vencimiento" required id="fecha_vencimiento">
             <button type="submit">Agregar tarea</button>
         </form>
@@ -49,6 +67,10 @@
             <h2>Buscar tareas</h2>
             <input type="text" id="buscarTitulo" placeholder="Buscar por título">
             <input type="date" id="buscarFecha">
+            <select id="buscarCompletada">
+                <!-- JS lo llenará automáticamente -->
+            </select>
+
             <div class="actions">
                 <button type="button" onclick="buscar()">Buscar</button>
                 <button type="button" onclick="cargarTareas()">Ver todas</button>
@@ -65,5 +87,5 @@
 
     <script src="/static/app.js"></script>
 </body>
-</html>
 
+</html>

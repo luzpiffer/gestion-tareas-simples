@@ -8,6 +8,8 @@ import pyodbc
 import os
 import hashlib
 import secrets
+from fastapi import Query
+
 
 app = FastAPI(title="Gestor de Tareas")
 
@@ -17,7 +19,7 @@ app.mount("/static", StaticFiles(directory="."), name="static")
 # --- Conexión a SQL Server ---
 CONNECTION_STRING = (
     "DRIVER={ODBC Driver 17 for SQL Server};"
-    "SERVER=localhost;"
+    "SERVER=DESKTOP-ELU753R\\SQLEXPRESS;"
     "DATABASE=GestorTareas;"
     "Trusted_Connection=yes;"
 )
@@ -35,9 +37,13 @@ class Tarea(BaseModel):
     descripcion: Optional[str] = None
     prioridad: Optional[str] = None
     fecha_vencimiento: Optional[str] = None
+    completada: Optional[bool] = False
+    categorias: Optional[List[str]] = [] 
+
 
 class TareaOut(Tarea):
     id: int
+
 
 # --- Seguridad básica ---
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -93,21 +99,60 @@ def crear_tarea(usuario_id: int, tarea: Tarea):
         (tarea.titulo, tarea.descripcion, tarea.prioridad, tarea.fecha_vencimiento, usuario_id)
     )
     new_id = cur.fetchone()[0]
+    asignar_categorias(conn, new_id, tarea.categorias)
     conn.commit()
     conn.close()
     return TareaOut(id=new_id, **tarea.dict())
 
 @app.get("/tareas/{usuario_id}", response_model=List[TareaOut])
-def listar_tareas(usuario_id: int):
+def listar_tareas(
+    usuario_id: int,
+    titulo: Optional[str] = None,
+    fecha: Optional[str] = None,
+    completada: Optional[int] = Query(None, ge=0, le=1)
+):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute(
-        "SELECT id, titulo, descripcion, prioridad, fecha_vencimiento FROM Tareas WHERE usuario_id = ?",
-        (usuario_id,)
-    )
+    
+    query = """
+        SELECT t.id, t.titulo, t.descripcion, t.prioridad, t.fecha_vencimiento, t.completada,
+               STRING_AGG(c.nombre, ',') AS categorias
+        FROM Tareas t
+        LEFT JOIN TareasCategorias tc ON t.id = tc.tarea_id
+        LEFT JOIN Categorias c ON tc.categoria_id = c.id
+        WHERE t.usuario_id = ?
+    """
+    params = [usuario_id]
+
+    if titulo:  # solo si se pasa
+        query += " AND t.titulo LIKE ?"
+        params.append(f"%{titulo}%")
+    if fecha:  # solo si se pasa
+        query += " AND t.fecha_vencimiento = ?"
+        params.append(fecha)
+    if completada is not None:  # solo si se pasa
+        query += " AND t.completada = ?"
+        params.append(completada)
+
+    query += " GROUP BY t.id, t.titulo, t.descripcion, t.prioridad, t.fecha_vencimiento, t.completada"
+
+    cur.execute(query, params)
     rows = cur.fetchall()
     conn.close()
-    return [TareaOut(id=r[0], titulo=r[1], descripcion=r[2], prioridad=r[3], fecha_vencimiento=str(r[4])) for r in rows]
+    
+    tareas = []
+    for r in rows:
+        cats = r[6].split(',') if r[6] else []
+        tareas.append(TareaOut(
+            id=r[0],
+            titulo=r[1],
+            descripcion=r[2],
+            prioridad=r[3],
+            fecha_vencimiento=str(r[4]),
+            completada=bool(r[5]),
+            categorias=cats
+        ))
+    return tareas
 
 @app.delete("/tareas/{usuario_id}/{tarea_id}")
 def eliminar_tarea(usuario_id: int, tarea_id: int):
@@ -120,6 +165,94 @@ def eliminar_tarea(usuario_id: int, tarea_id: int):
     conn.commit()
     conn.close()
     return {"mensaje": "Tarea eliminada"}
+
+from datetime import datetime
+
+@app.put("/tareas/{usuario_id}/{tarea_id}", response_model=TareaOut)
+def editar_tarea(usuario_id: int, tarea_id: int, tarea: Tarea):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # Validaciones
+    if not tarea.titulo or tarea.titulo.strip() == "":
+        raise HTTPException(status_code=400, detail="El título es obligatorio")
+
+    if tarea.fecha_vencimiento:
+        try:
+            fecha = datetime.strptime(tarea.fecha_vencimiento, "%Y-%m-%d").date()
+            if fecha < datetime.now().date():
+                raise HTTPException(status_code=400, detail="La fecha no puede ser en el pasado")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Formato de fecha inválido (usar YYYY-MM-DD)")
+
+    # Verificar que la tarea existe y es del usuario
+    cur.execute("SELECT id FROM Tareas WHERE id = ? AND usuario_id = ?", (tarea_id, usuario_id))
+    if not cur.fetchone():
+        conn.close()
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+
+    # Actualizar
+    cur.execute(
+        """
+        UPDATE Tareas
+        SET titulo = ?, descripcion = ?, prioridad = ?, fecha_vencimiento = ?
+        WHERE id = ? AND usuario_id = ?
+        """,
+        (tarea.titulo, tarea.descripcion, tarea.prioridad, tarea.fecha_vencimiento, tarea_id, usuario_id)
+    )
+    asignar_categorias(conn, tarea_id, tarea.categorias)
+    conn.commit()
+    conn.close()
+    return TareaOut(id=tarea_id, **tarea.dict())
+
+@app.get("/categorias")
+def listar_categorias():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT nombre FROM Categorias ORDER BY nombre")
+    rows = cur.fetchall()
+    conn.close()
+    return [r[0] for r in rows]
+
+@app.get("/estados_tarea")
+def listar_estados_tarea():
+    # Retornamos id y label
+    return [
+        {"id": 0, "nombre": "Pendiente"},
+        {"id": 1, "nombre": "Completada"}
+    ]
+
+def asignar_categorias(conn, tarea_id: int, categorias: List[str]):
+    cur = conn.cursor()
+    # Eliminar categorías previas
+    cur.execute("DELETE FROM TareasCategorias WHERE tarea_id = ?", (tarea_id,))
+    # Insertar nuevas categorías
+    for cat in categorias:
+        # obtener id de la categoría
+        cur.execute("SELECT id FROM Categorias WHERE nombre = ?", (cat,))
+        row = cur.fetchone()
+        if row:
+            cat_id = row[0]
+            cur.execute(
+                "INSERT INTO TareasCategorias (tarea_id, categoria_id) VALUES (?, ?)",
+                (tarea_id, cat_id)
+            )
+
+# --- Marcar Tarea como Completada ---
+@app.patch("/tareas/{usuario_id}/{tarea_id}/completada")
+def marcar_completada(usuario_id: int, tarea_id: int, completada: bool):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE Tareas SET completada = ? WHERE id = ? AND usuario_id = ?",
+        (completada, tarea_id, usuario_id)
+    )
+    if cur.rowcount == 0:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Tarea no encontrada")
+    conn.commit()
+    conn.close()
+    return {"mensaje": "Tarea actualizada", "completada": completada}
 
 # --- HTML principal ---
 @app.get("/")
