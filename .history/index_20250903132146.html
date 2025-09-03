@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Tareas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="notificaciones"></div>
+
+    <div id="authContainer">
+        <div class="main-container" id="mainContainer">
+            <div class="auth-panel left-panel">
+                <h1>Inicia Sesión</h1>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" placeholder="Usuario" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Contraseña" required>
+                    </div>
+                    <button type="submit" class="auth-button">Ingresar</button>
+                </form>
+            </div>
+
+            <div class="auth-panel right-panel">
+                <h1>Crea una Cuenta</h1>
+                <form id="registroForm">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="regUsername" placeholder="Nombre de Usuario" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="regEmail" placeholder="Email" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="regPassword" placeholder="Contraseña" required>
+                    </div>
+                    <button type="submit" class="auth-button">Registrar</button>
+                </form>
+            </div>
+
+            <div class="overlay-container">
+                <div class="overlay">
+                    <div class="overlay-panel overlay-left">
+                        <h1>¡Bienvenido de Nuevo!</h1>
+                        <p>Para mantenerte conectado, por favor inicia sesión con tu información personal.</p>
+                        <button class="ghost-button" id="signInBtn">Ingresar</button>
+                    </div>
+                    <div class="overlay-panel overlay-right">
+                        <h1>¡Hola, Amigo!</h1>
+                        <p>Ingresa tus datos personales y comienza tu viaje con nosotros.</p>
+                        <button class="ghost-button" id="signUpBtn">Registrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tareasContainer" style="display: none;">
+        <h1>Gestor de Tareas</h1>
+        <button id="logoutBtn">Cerrar sesión</button>
+
+        <form id="formTarea" class="card">
+            <h2>Nueva tarea</h2>
+            <input type="text" name="titulo" placeholder="Título" required>
+            <textarea name="descripcion" placeholder="Descripción"></textarea>
+            <select name="prioridad" required>
+                <option value="" disabled selected>Prioridad de la tarea</option>
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+            </select>
+            <input type="date" name="fecha_vencimiento" required id="fecha_vencimiento">
+            <button type="submit">Agregar tarea</button>
+        </form>
+
+        <div class="card" id="buscarTareasCard">
+            <h2>Buscar tareas</h2>
+            <input type="text" id="buscarTitulo" placeholder="Buscar por título">
+            <input type="date" id="buscarFecha">
+            <div class="actions">
+                <button type="button" onclick="buscar()">Buscar</button>
+                <button type="button" onclick="cargarTareas()">Ver todas</button>
+                <button type="button" onclick="limpiarBusqueda()">Limpiar</button>
+            </div>
+        </div>
+
+        <div class="card" id="listaTareasCard">
+            <h2>Lista de Tareas</h2>
+            <div id="listaTareas"></div>
+        </div>
+    </div>
+    
+    <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestor de Tareas con Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="notificaciones"></div>
+
+    <div id="authContainer">
+        <div id="mainContainer">
+            
+            <div id="loginPanel" class="auth-panel left-panel active">
+                <div class="panel-content">
+                    <h1>Inicia Sesión</h1>
+                    <form id="loginForm">
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="username" placeholder="Usuario" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="auth-button">Iniciar Sesión</button>
+                    </form>
+                    <p class="panel-switch-text">¿No tienes una cuenta?</p>
+                    <button id="showRegisterPanel" class="ghost-button">Crear Cuenta</button>
+                </div>
+            </div>
+
+            <div id="registerPanel" class="auth-panel right-panel">
+                <div class="panel-content">
+                    <h1>Crea una Cuenta</h1>
+                    <form id="registroForm">
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="regUsername" placeholder="Nombre de Usuario" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="regPassword" placeholder="Contraseña" required>
+                        </div>
+                        <button type="submit" class="auth-button">Crear Cuenta</button>
+                    </form>
+                    <p class="panel-switch-text">¿Ya tienes una cuenta?</p>
+                    <button id="showLoginPanel" class="ghost-button">Iniciar Sesión</button>
+                </div>
+            </div>
+
+            <div class="overlay-container">
+                <div class="overlay">
+                    <div class="overlay-panel overlay-left">
+                        <h1>¡Hola!</h1>
+                        <p>Ingresa tus datos personales y comienza a organizar tus tareas.</p>
+                        <button class="ghost-button" id="signInButton">Iniciar Sesión</button>
+                    </div>
+                    <div class="overlay-panel overlay-right">
+                        <h1>¡Bienvenido de Nuevo!</h1>
+                        <p>Para mantenerte conectado, inicia sesión con tu información.</p>
+                        <button class="ghost-button" id="signUpButton">Crear Cuenta</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" id="tareasContainer" style="display:none;">
+        <button id="logoutBtn">Cerrar sesión</button>
+        <h1>Gestor de Tareas</h1>
+        
+        <form id="formTarea" class="card">
+            <h2>Nueva tarea</h2>
+            <input type="text" name="titulo" placeholder="Título" required>
+            <textarea name="descripcion" placeholder="Descripción"></textarea>
+            <select name="prioridad" required>
+                <option value="" disabled selected>Prioridad de la tarea</option>
+                <option value="baja">Baja</option>
+                <option value="media">Media</option>
+                <option value="alta">Alta</option>
+            </select>
+            <input type="date" name="fecha_vencimiento" required id="fecha_vencimiento">
+            <button type="submit">Agregar tarea</button>
+        </form>
+
+        <div class="card" id="buscarTareasCard">
+            <h2>Buscar tareas</h2>
+            <input type="text" id="buscarTitulo" placeholder="Buscar por título">
+            <input type="date" id="buscarFecha">
+            <div class="actions">
+                <button type="button" onclick="buscar()">Buscar</button>
+                <button type="button" onclick="cargarTareas()">Ver todas</button>
+                <button type="button" onclick="limpiarBusqueda()">Limpiar</button>
+            </div>
+        </div>
+
+        <div class="card" id="listaTareasCard">
+            <h2>Lista de Tareas</h2>
+            <div id="listaTareas"></div>
+        </div>
+    </div>
+    
+    <script src="/static/app.js"></script>
+</body>
+</html>
+
