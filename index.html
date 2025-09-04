@@ -1,91 +1,91 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-    <title>Gestor de Tareas con Login</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tareas</title>
+
+    <!-- Fonts y icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <style>
-        /* Estilo para tareas completadas */
-        .tarea.completada h3,
-        .tarea.completada p {
-            text-decoration: line-through;
-            color: gray;
-            opacity: 0.7;
-        }
-    </style>
-
-    <div id="notificaciones"></div>
-
-    <!-- Login -->
-    <div class="container" id="loginContainer">
-        <h1>Login</h1>
-        <form id="loginForm" class="card">
-            <input type="text" id="username" placeholder="Usuario" required>
-            <input type="password" id="password" placeholder="Contraseña" required>
-            <button type="submit">Ingresar</button>
-        </form>
-        <form id="registroForm" class="card">
-            <h3>Registrar nuevo usuario</h3>
-            <input type="text" id="regUsername" placeholder="Usuario" required>
-            <input type="password" id="regPassword" placeholder="Contraseña" required>
-            <button type="submit">Registrar</button>
-        </form>
-    </div>
-
-    <!-- Gestor de tareas -->
-    <div class="container" id="tareasContainer" style="display:none;">
-        <h1>Gestor de Tareas</h1>
-        <button id="logoutBtn">Cerrar sesión</button>
-
-
-        <!-- Formulario de nueva tarea -->
-        <form id="formTarea" class="card">
-            <h2>Nueva tarea</h2>
-            <input type="text" name="titulo" placeholder="Título" required>
-            <textarea name="descripcion" placeholder="Descripción"></textarea>
-            <select name="prioridad" required>
-                <option value="" disabled selected>Prioridad de la tarea</option>
-                <option value="baja">Baja</option>
-                <option value="media">Media</option>
-                <option value="alta">Alta</option>
-            </select>
-            <select name="categorias" multiple>
-                <!-- JS lo llenará automáticamente -->
-            </select>
-
-
-            <input type="date" name="fecha_vencimiento" required id="fecha_vencimiento">
-            <button type="submit">Agregar tarea</button>
-        </form>
-
-        <!-- Buscador de tareas -->
-        <div class="card" id="buscarTareasCard">
-            <h2>Buscar tareas</h2>
-            <input type="text" id="buscarTitulo" placeholder="Buscar por título">
-            <input type="date" id="buscarFecha">
-            <select id="buscarCompletada">
-                <!-- JS lo llenará automáticamente -->
-            </select>
-
-            <div class="actions">
-                <button type="button" onclick="buscar()">Buscar</button>
-                <button type="button" onclick="cargarTareas()">Ver todas</button>
-                <button type="button" onclick="limpiarBusqueda()">Limpiar</button>
-            </div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>📋 Gestor de Tareas</h2>
         </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-filter="all">📊 Todas</a>
+            <a href="#" class="nav-item" data-filter="pending">⏳ Pendientes</a>
+            <a href="#" class="nav-item" data-filter="completed">✅ Completadas</a>
+        </nav>
+        <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
+    </aside>
 
-        <!-- Lista de tareas -->
-        <div class="card" id="listaTareasCard">
-            <h2>Lista de Tareas</h2>
-            <div id="listaTareas"></div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="main-header">
+            <h1>Gestor de Tareas</h1>
+        </header>
+
+        <div class="content-grid">
+            <!-- Formulario de nueva tarea -->
+            <section class="task-form-section" id="tareasContainer">
+                <div class="glass-card">
+                    <h3>Crear Nueva Tarea</h3>
+                    <form id="formTarea">
+                        <input type="text" name="titulo" placeholder="Título" required>
+                        <textarea name="descripcion" placeholder="Descripción"></textarea>
+                        <select name="prioridad" required>
+                            <option value="" disabled selected>Prioridad</option>
+                            <option value="baja">Baja</option>
+                            <option value="media">Media</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                        <select name="categorias" multiple></select>
+                        <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" required>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-submit">Agregar Tarea</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Lista de tareas -->
+            <section class="tasks-section">
+                <div class="glass-card">
+                    <div class="section-header">
+                        <h3>Mis Tareas</h3>
+                        <span class="task-count" id="taskCount">0 tareas</span>
+                    </div>
+                    <div class="tasks-container" id="listaTareas">
+                        <!-- Las tareas se renderizarán aquí -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Buscador -->
+            <section class="task-search-section">
+                <div class="glass-card" id="buscarTareasCard">
+                    <input type="text" id="buscarTitulo" placeholder="Buscar por título">
+                    <input type="date" id="buscarFecha">
+                    <select id="buscarCompletada"></select>
+                    <button type="button" onclick="buscar()" class="btn-submit">Buscar</button>
+                    <button type="button" onclick="cargarTareas()" class="btn-submit">Ver todas</button>
+                    <button type="button" onclick="limpiarBusqueda()" class="btn-cancel">Limpiar</button>
+                </div>
+            </section>
         </div>
-    </div>
+    </main>
 
-    <script src="/static/app.js"></script>
+        <!-- Notificación -->
+    <div id="notificaciones" class="notificaciones"></div>
+
+    <script src="app.js"></script>
 </body>
-
 </html>
+
