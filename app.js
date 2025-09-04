@@ -1,9 +1,14 @@
 const API = "/tareas";
-let currentUserId = null;
+let currentUser = JSON.parse(localStorage.getItem("currentUser")); // Debe guardar {id, username}
+
+// --- Verificar login ---
+if (!currentUser) {
+    window.location.href = "register.html";
+}
 
 // --- Notificaciones ---
 function mostrarNotificacion(mensaje, tipo = "exito") {
-    const cont = document.getElementById("notificaciones");
+    const cont = document.getElementById("notificaciones") || createNotificationContainer();
     const div = document.createElement("div");
     div.className = `notificacion ${tipo}`;
     div.textContent = mensaje;
@@ -11,58 +16,17 @@ function mostrarNotificacion(mensaje, tipo = "exito") {
     setTimeout(() => div.remove(), 3500);
 }
 
-// --- Login ---
-document.getElementById("loginForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-
-    const data = new URLSearchParams();
-    data.append("username", username);
-    data.append("password", password);
-
-    const res = await fetch("/login", { method: "POST", body: data });
-    if (res.ok) {
-        const resp = await res.json();
-        currentUserId = resp.user_id;
-        document.getElementById("loginContainer").style.display = "none";
-        document.getElementById("tareasContainer").style.display = "block";
-        mostrarNotificacion("Bienvenido/a " + username, "exito");
-        await cargarCategorias(); 
-        await cargarEstados();
-        cargarTareas();
-    } else {
-        mostrarNotificacion("Usuario o contraseña incorrectos", "error");
-    }
-});
-
-// --- Registro ---
-document.getElementById("registroForm").addEventListener("submit", async e => {
-    e.preventDefault();
-    const username = document.getElementById("regUsername").value;
-    const password = document.getElementById("regPassword").value;
-
-    const res = await fetch("/registro", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-    });
-
-    if (res.ok) {
-        mostrarNotificacion("Usuario registrado ✅", "exito");
-        document.getElementById("regUsername").value = "";
-        document.getElementById("regPassword").value = "";
-    } else {
-        const err = await res.json();
-        mostrarNotificacion(err.detail || "Error al registrar", "error");
-    }
-});
+function createNotificationContainer() {
+    const cont = document.createElement("div");
+    cont.id = "notificaciones";
+    document.body.appendChild(cont);
+    return cont;
+}
 
 // --- Logout ---
 document.getElementById("logoutBtn").addEventListener("click", () => {
-    currentUserId = null;
-    document.getElementById("tareasContainer").style.display = "none";
-    document.getElementById("loginContainer").style.display = "block";
+    localStorage.removeItem("currentUser");
+    window.location.href = "register.html";
 });
 
 // --- Fecha mínima ---
@@ -70,38 +34,30 @@ const fechaInput = document.getElementById("fecha_vencimiento");
 const hoy = new Date().toISOString().split("T")[0];
 fechaInput.min = hoy;
 
-// --- Funciones de tareas ---
-async function cargarTareas() {
-    if (!currentUserId) return;
-    const res = await fetch(`${API}/${currentUserId}`);
-    const tareas = await res.json();
-    mostrarTareas(tareas);
-}
+// --- Cargar categorías ---
+let categoriasGlobal = []; // Guardaremos todas las categorías con ID y nombre
 
 async function cargarCategorias() {
     const res = await fetch("/categorias");
     if (!res.ok) return;
-    const categorias = await res.json(); // ["Trabajo", "Personal", ...]
-    
-    // Formulario nueva tarea
+    categoriasGlobal = await res.json(); // Debe devolver [{id:1,nombre:"Trabajo"},...]
     const selectNueva = document.querySelector("#formTarea select[name='categorias']");
-    selectNueva.innerHTML = ""; // limpiar
-    categorias.forEach(cat => {
+    selectNueva.innerHTML = "";
+    categoriasGlobal.forEach(cat => {
         const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
+        option.value = cat.id; // Guardamos ID
+        option.textContent = cat.nombre;
         selectNueva.appendChild(option);
     });
 }
 
+// --- Cargar estados ---
 async function cargarEstados() {
     const res = await fetch("/estados_tarea");
     if (!res.ok) return;
-    const estados = await res.json(); // [{id:0,nombre:"Pendiente"}, {id:1,nombre:"Completada"}]
-    
+    const estados = await res.json();
     const select = document.getElementById("buscarCompletada");
-    select.innerHTML = '<option value="">Todos</option>'; // opción por defecto
-    
+    select.innerHTML = '<option value="">Todos</option>';
     estados.forEach(e => {
         const option = document.createElement("option");
         option.value = e.id;
@@ -110,40 +66,52 @@ async function cargarEstados() {
     });
 }
 
+// --- Cargar tareas ---
+async function cargarTareas() {
+    if (!currentUser) return;
+    const res = await fetch(`${API}/${currentUser.id}`);
+    if (!res.ok) {
+        mostrarNotificacion("Error al cargar tareas ❌", "error");
+        return;
+    }
+    const tareas = await res.json();
+    mostrarTareas(Array.isArray(tareas) ? tareas : []);
+}
 
+// --- Mostrar tareas ---
 function mostrarTareas(tareas) {
     const div = document.getElementById("listaTareas");
     div.innerHTML = "";
-    if (tareas.length === 0) {
+    if (!tareas || tareas.length === 0) {
         div.innerHTML = "<p>No hay tareas.</p>";
         return;
     }
 
     tareas.forEach(t => {
         const tareaDiv = document.createElement("div");
-        tareaDiv.classList.add("tarea", t.prioridad);
+        tareaDiv.classList.add("tarea", t.prioridad || "baja");
         if (t.completada) tareaDiv.classList.add("completada");
 
         tareaDiv.innerHTML = `
-            <input type="checkbox" class="check-completada" ${t.completada ? "checked" : ""} title="Marcar como completada">
+            <input type="checkbox" class="check-completada" ${t.completada ? "checked" : ""}>
             <span class="cerrar" title="Eliminar tarea">✖</span>
             <span class="editar" title="Editar tarea">✏️</span>
-            <h3>${t.titulo} <small>(${t.prioridad})</small></h3>
+            <h3>${t.titulo} <small>(${t.prioridad || "Baja"})</small></h3>
             <p>${t.descripcion || "Sin descripción"}</p>
-            <small>📅 Vence: ${t.fecha_vencimiento}</small>
+            <small>📅 Vence: ${t.fecha_vencimiento || "N/A"}</small>
         `;
 
-        // Checkbox completada
+        // Completar
         tareaDiv.querySelector(".check-completada").addEventListener("change", async (e) => {
-            const res = await fetch(`${API}/${currentUserId}/${t.id}/completada?completada=${e.target.checked}`, {
+            const res = await fetch(`${API}/${currentUser.id}/${t.id}/completada?completada=${e.target.checked}`, {
                 method: "PATCH"
             });
             if (res.ok) {
                 tareaDiv.classList.toggle("completada", e.target.checked);
-                mostrarNotificacion(e.target.checked ? "Tarea completada ✅" : "Tarea marcada como pendiente ⚠️", "exito");
+                mostrarNotificacion(e.target.checked ? "Tarea completada ✅" : "Tarea pendiente ⚠️");
             } else {
                 mostrarNotificacion("Error al actualizar ❌", "error");
-                e.target.checked = !e.target.checked; // revertir
+                e.target.checked = !e.target.checked;
             }
         });
 
@@ -161,7 +129,93 @@ function mostrarTareas(tareas) {
     });
 }
 
+// --- Crear tarea ---
+document.getElementById("formTarea").addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!currentUser) return;
 
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    const categoriasIds = Array.from(e.target.querySelector('[name="categorias"]').selectedOptions).map(o => parseInt(o.value));
+    data.usuario_id = currentUser.id;
+    data.categorias = categoriasIds;
+
+    // Convertir prioridad a valor por defecto si está vacío
+    if (!data.prioridad) data.prioridad = "baja";
+
+    console.log("📤 Enviando tarea:", data);
+
+    const res = await fetch(`${API}/${currentUser.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        mostrarNotificacion("Tarea agregada ✅");
+        e.target.reset();
+        cargarTareas();
+    } else {
+        const err = await res.json();
+        mostrarNotificacion(err.detail || "Error al agregar ❌", "error");
+    }
+});
+
+// --- Buscar ---
+async function buscar() {
+    if (!currentUser) return;
+
+    const titulo = document.getElementById("buscarTitulo").value.trim();
+    const fecha = document.getElementById("buscarFecha").value;
+    const completada = document.getElementById("buscarCompletada").value;
+
+    const params = new URLSearchParams();
+    if (titulo) params.append("titulo", titulo);
+    if (fecha) params.append("fecha", fecha);
+    if (completada !== "") params.append("completada", completada);
+
+    const res = await fetch(`${API}/${currentUser.id}?${params.toString()}`);
+    if (!res.ok) {
+        mostrarNotificacion("Error al buscar tareas ❌", "error");
+        return;
+    }
+    const tareas = await res.json();
+    mostrarTareas(Array.isArray(tareas) ? tareas : []);
+}
+
+// --- Limpiar búsqueda ---
+function limpiarBusqueda() {
+    document.getElementById("buscarTitulo").value = "";
+    document.getElementById("buscarFecha").value = "";
+    cargarTareas();
+}
+
+// --- Confirmar eliminar ---
+function confirmarEliminar(idTarea) {
+    const overlay = document.createElement("div");
+    overlay.className = "confirm-modal-overlay";
+    const modal = document.createElement("div");
+    modal.className = "confirm-modal";
+    modal.innerHTML = `
+        <p>¿Seguro que querés eliminar esta tarea?</p>
+        <div class="actions">
+            <button id="confirm-si">Sí</button>
+            <button id="confirm-no">No</button>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.appendChild(modal);
+
+    document.getElementById("confirm-si").addEventListener("click", async () => {
+        const res = await fetch(`${API}/${currentUser.id}/${idTarea}`, { method: "DELETE" });
+        if (res.ok) mostrarNotificacion("Tarea eliminada ✅");
+        else mostrarNotificacion("Error al eliminar ❌", "error");
+        cargarTareas();
+        overlay.remove();
+    });
+    document.getElementById("confirm-no").addEventListener("click", () => overlay.remove());
+}
+
+// --- Editar tarea ---
 async function editarTareaForm(tarea) {
     const overlay = document.createElement("div");
     overlay.className = "confirm-modal-overlay";
@@ -187,26 +241,20 @@ async function editarTareaForm(tarea) {
     document.body.appendChild(overlay);
     overlay.appendChild(modal);
 
-    // Validar fecha mínima
     const fechaEditarInput = document.getElementById("fechaEditar");
-    const hoy = new Date().toISOString().split("T")[0];
     fechaEditarInput.min = hoy;
 
-    // Crear select de categorías dinámico
+    // Categorías
     const selectCategorias = document.createElement("select");
     selectCategorias.name = "categorias";
     selectCategorias.multiple = true;
-
-    const categoriasDB = await fetch("/categorias").then(r => r.json());
-    categoriasDB.forEach(cat => {
+    categoriasGlobal.forEach(cat => {
         const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
-        if (tarea.categorias.includes(cat)) option.selected = true;
+        option.value = cat.id;
+        option.textContent = cat.nombre;
+        if (tarea.categorias_ids?.includes(cat.id)) option.selected = true;
         selectCategorias.appendChild(option);
     });
-
-    // Insertar select antes del input de fecha
     modal.querySelector("form").insertBefore(selectCategorias, fechaEditarInput);
 
     document.getElementById("cancelarEditar").addEventListener("click", () => overlay.remove());
@@ -214,12 +262,10 @@ async function editarTareaForm(tarea) {
     document.getElementById("formEditar").addEventListener("submit", async e => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(e.target).entries());
+        data.usuario_id = currentUser.id;
+        const categoriasIds = Array.from(e.target.querySelector('[name="categorias"]').selectedOptions).map(o => parseInt(o.value));
+        data.categorias = categoriasIds;
 
-        // Extraer categorías seleccionadas
-        const categorias = Array.from(e.target.querySelector('[name="categorias"]').selectedOptions).map(o => o.value);
-        data.categorias = categorias;
-
-        // Validación
         if (!data.titulo.trim()) {
             mostrarNotificacion("El título es obligatorio ❌", "error");
             return;
@@ -229,101 +275,23 @@ async function editarTareaForm(tarea) {
             return;
         }
 
-        const res = await fetch(`${API}/${currentUserId}/${tarea.id}`, {
+        const res = await fetch(`${API}/${currentUser.id}/${tarea.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
         });
+
         if (res.ok) {
-            mostrarNotificacion("Tarea actualizada ✅", "exito");
+            mostrarNotificacion("Tarea actualizada ✅");
             cargarTareas();
         } else {
-            const err = await res.json();
-            mostrarNotificacion(err.detail || "Error al editar ❌", "error");
+            mostrarNotificacion("Error al editar ❌", "error");
         }
         overlay.remove();
     });
 }
 
-
-
-function confirmarEliminar(idTarea) {
-    const overlay = document.createElement("div");
-    overlay.className = "confirm-modal-overlay";
-    const modal = document.createElement("div");
-    modal.className = "confirm-modal";
-    modal.innerHTML = `
-        <p>¿Seguro que querés eliminar esta tarea?</p>
-        <div class="actions">
-            <button id="confirm-si">Sí</button>
-            <button id="confirm-no">No</button>
-        </div>
-    `;
-    document.body.appendChild(overlay);
-    overlay.appendChild(modal);
-
-    document.getElementById("confirm-si").addEventListener("click", async () => {
-        const res = await fetch(`${API}/${currentUserId}/${idTarea}`, { method: "DELETE" });
-        if (res.ok) mostrarNotificacion("Tarea eliminada ✅", "exito");
-        else mostrarNotificacion("Error al eliminar ❌", "error");
-        cargarTareas();
-        overlay.remove();
-    });
-    document.getElementById("confirm-no").addEventListener("click", () => overlay.remove());
-}
-
-// --- Crear tarea ---
-document.getElementById("formTarea").addEventListener("submit", async e => {
-    e.preventDefault();
-    if (!currentUserId) return;
-
-    const data = Object.fromEntries(new FormData(e.target).entries());
-
-    // --- Esto extrae las categorías seleccionadas ---
-    const categorias = Array.from(e.target.querySelector('[name="categorias"]').selectedOptions).map(o => o.value);
-    data.categorias = categorias;
-
-    const res = await fetch(`${API}/${currentUserId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
-
-    if (res.ok) {
-        mostrarNotificacion("Tarea agregada ✅", "exito");
-        e.target.reset();
-        cargarTareas();
-    } else mostrarNotificacion("Error al agregar ❌", "error");
-});
-
-
-// --- Buscar ---
-async function buscar() {
-    if (!currentUserId) return;
-
-    const titulo = document.getElementById("buscarTitulo").value.trim();
-    const fecha = document.getElementById("buscarFecha").value;
-    const completada = document.getElementById("buscarCompletada").value;
-
-    const params = new URLSearchParams();
-
-    if (titulo) params.append("titulo", titulo);
-    if (fecha) params.append("fecha", fecha);
-    if (completada !== "") params.append("completada", completada);
-
-    const res = await fetch(`${API}/${currentUserId}?${params.toString()}`);
-    if (!res.ok) {
-        mostrarNotificacion("Error al buscar tareas ❌", "error");
-        return;
-    }
-
-    const tareas = await res.json();
-    mostrarTareas(tareas);
-}
-
-// --- Limpiar búsqueda ---
-function limpiarBusqueda() {
-    document.getElementById("buscarTitulo").value = "";
-    document.getElementById("buscarFecha").value = "";
-    cargarTareas();
-}
+// --- Inicial ---
+cargarCategorias();
+cargarEstados();
+cargarTareas();
