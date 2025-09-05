@@ -87,6 +87,7 @@ function mostrarTareas(tareas) {
         return;
     }
 
+
     tareas.forEach(t => {
         const tareaDiv = document.createElement("div");
         tareaDiv.classList.add("tarea", t.prioridad || "baja");
@@ -119,6 +120,7 @@ function mostrarTareas(tareas) {
         tareaDiv.querySelector(".cerrar").addEventListener("click", () => {
             confirmarEliminar(t.id);
         });
+
 
         // Editar
         tareaDiv.querySelector(".editar").addEventListener("click", () => {
@@ -190,29 +192,32 @@ function limpiarBusqueda() {
 }
 
 // --- Confirmar eliminar ---
-function confirmarEliminar(idTarea) {
-    const overlay = document.createElement("div");
-    overlay.className = "confirm-modal-overlay";
-    const modal = document.createElement("div");
-    modal.className = "confirm-modal";
-    modal.innerHTML = `
-        <p>¿Seguro que querés eliminar esta tarea?</p>
-        <div class="actions">
-            <button id="confirm-si">Sí</button>
-            <button id="confirm-no">No</button>
-        </div>
-    `;
-    document.body.appendChild(overlay);
-    overlay.appendChild(modal);
-
-    document.getElementById("confirm-si").addEventListener("click", async () => {
-        const res = await fetch(`${API}/${currentUser.id}/${idTarea}`, { method: "DELETE" });
-        if (res.ok) mostrarNotificacion("Tarea eliminada ✅");
-        else mostrarNotificacion("Error al eliminar ❌", "error");
-        cargarTareas();
-        overlay.remove();
+async function confirmarEliminar(idTarea) {
+    const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "No podrás revertir esto",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
     });
-    document.getElementById("confirm-no").addEventListener("click", () => overlay.remove());
+
+    if (result.isConfirmed) {
+        try {
+            const res = await fetch(`${API}/${currentUser.id}/${idTarea}`, { method: "DELETE" });
+            if (res.ok) {
+                Swal.fire('Eliminado!', 'La tarea ha sido eliminada.', 'success');
+                cargarTareas(); // recarga la lista actualizada
+            } else {
+                const error = await res.json();
+                Swal.fire('Error', error.detail || 'No se pudo eliminar la tarea.', 'error');
+            }
+        } catch (err) {
+            Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+        }
+    }
 }
 
 // --- Editar tarea ---

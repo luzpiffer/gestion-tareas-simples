@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Depends
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
@@ -14,12 +14,12 @@ from fastapi import Query
 app = FastAPI(title="Gestor de Tareas")
 
 # --- Archivos estáticos ---
-app.mount("/static", StaticFiles(directory="."), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # --- Conexión a SQL Server ---
 CONNECTION_STRING = (
     "DRIVER={ODBC Driver 17 for SQL Server};"
-    "SERVER=DANA\SQLEXPRESS;"
+    "SERVER=DESKTOP-ELU753R\\SQLEXPRESS;"
     "DATABASE=GestorTareas;"
     "Trusted_Connection=yes;"
 )
@@ -32,18 +32,20 @@ class Usuario(BaseModel):
     username: str
     password: str
 
+class UsuarioResponse(BaseModel):
+    id: int
+    username: str
+
 class Tarea(BaseModel):
     titulo: str
     descripcion: Optional[str] = None
     prioridad: Optional[str] = None
     fecha_vencimiento: Optional[str] = None
     completada: Optional[bool] = False
-    categorias: Optional[List[str]] = [] 
-
+    categorias: Optional[List[int]] = []
 
 class TareaOut(Tarea):
     id: int
-
 
 # --- Seguridad básica ---
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -55,39 +57,54 @@ def hash_password(password: str) -> str:
 def verify_password(password: str, hashed: str) -> bool:
     return hash_password(password) == hashed
 
-# --- Endpoints de usuarios ---
-@app.post("/registro")
+# --- Ruta raíz redirige a register.html ---
+@app.get("/")
+def root():
+    return RedirectResponse(url="/register.html", status_code=302)
+
+# --- Servir archivos HTML ---
+@app.get("/register.html")
+def register_page():
+    return FileResponse("register.html")
+
+@app.get("/index.html")
+def index_page():
+    return FileResponse("index.html")
+
+# --- Endpoints de usuarios (actualizados) ---
+@app.post("/usuarios/register", response_model=UsuarioResponse)
 def registro(usuario: Usuario):
     conn = get_connection()
     cur = conn.cursor()
     try:
         password_hash = hash_password(usuario.password)
         cur.execute(
-            "INSERT INTO Usuarios (username, password_hash) VALUES (?, ?)",
+            "INSERT INTO Usuarios (username, password_hash) OUTPUT INSERTED.id VALUES (?, ?)",
             (usuario.username, password_hash)
         )
+        user_id = cur.fetchone()[0]
         conn.commit()
-        return {"mensaje": "Usuario registrado exitosamente"}
+        return UsuarioResponse(id=user_id, username=usuario.username)
     except pyodbc.IntegrityError:
         raise HTTPException(status_code=400, detail="El nombre de usuario ya existe")
     finally:
         conn.close()
 
-@app.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends()):
+@app.post("/usuarios/login", response_model=UsuarioResponse)
+def login(usuario: Usuario):
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
         "SELECT id, password_hash FROM Usuarios WHERE username = ?",
-        (form_data.username,)
+        (usuario.username,)
     )
     row = cur.fetchone()
     conn.close()
-    if not row or not verify_password(form_data.password, row[1]):
+    
+    if not row or not verify_password(usuario.password, row[1]):
         raise HTTPException(status_code=401, detail="Usuario o contraseña incorrectos")
-    # token simple (no JWT por ahora)
-    token = secrets.token_hex(16)
-    return {"access_token": token, "token_type": "bearer", "user_id": row[0]}
+    
+    return UsuarioResponse(id=row[0], username=usuario.username)
 
 # --- Endpoints de tareas ---
 @app.post("/tareas/{usuario_id}", response_model=TareaOut)
@@ -115,12 +132,12 @@ def listar_tareas(
     cur = conn.cursor()
     
     query = """
-        SELECT t.id, t.titulo, t.descripcion, t.prioridad, t.fecha_vencimiento, t.completada,
-               STRING_AGG(c.nombre, ',') AS categorias
-        FROM Tareas t
-        LEFT JOIN TareasCategorias tc ON t.id = tc.tarea_id
-        LEFT JOIN Categorias c ON tc.categoria_id = c.id
-        WHERE t.usuario_id = ?
+    SELECT t.id, t.titulo, t.descripcion, t.prioridad, t.fecha_vencimiento, t.completada,
+           STRING_AGG(CAST(c.id AS VARCHAR), ',') AS categorias
+    FROM Tareas t
+    LEFT JOIN TareasCategorias tc ON t.id = tc.tarea_id
+    LEFT JOIN Categorias c ON tc.categoria_id = c.id
+    WHERE t.usuario_id = ?
     """
     params = [usuario_id]
 
@@ -142,24 +159,32 @@ def listar_tareas(
     
     tareas = []
     for r in rows:
-        cats = r[6].split(',') if r[6] else []
+        cats = [int(x) for x in r[6].split(',')] if r[6] else []
         tareas.append(TareaOut(
             id=r[0],
             titulo=r[1],
             descripcion=r[2],
             prioridad=r[3],
-            fecha_vencimiento=str(r[4]),
+            fecha_vencimiento=str(r[4]) if r[4] else None,
             completada=bool(r[5]),
             categorias=cats
-        ))
+))
+
     return tareas
 
 @app.delete("/tareas/{usuario_id}/{tarea_id}")
 def eliminar_tarea(usuario_id: int, tarea_id: int):
     conn = get_connection()
     cur = conn.cursor()
+   # Primero eliminar las categorías asociadas
     cur.execute(
-        "DELETE FROM Tareas WHERE id = ? AND usuario_id = ?",
+        "DELETE FROM TareasCategorias WHERE tarea_id = ?", 
+        (tarea_id,)
+    )
+    
+    #  Luego eliminar la tarea en sí
+    cur.execute(
+        "DELETE FROM Tareas WHERE id = ? AND usuario_id = ?", 
         (tarea_id, usuario_id)
     )
     conn.commit()
@@ -209,10 +234,11 @@ def editar_tarea(usuario_id: int, tarea_id: int, tarea: Tarea):
 def listar_categorias():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT nombre FROM Categorias ORDER BY nombre")
+    cur.execute("SELECT id, nombre FROM Categorias ORDER BY nombre")
     rows = cur.fetchall()
     conn.close()
-    return [r[0] for r in rows]
+    return [{"id": r[0], "nombre": r[1]} for r in rows]
+
 
 @app.get("/estados_tarea")
 def listar_estados_tarea():
@@ -222,21 +248,14 @@ def listar_estados_tarea():
         {"id": 1, "nombre": "Completada"}
     ]
 
-def asignar_categorias(conn, tarea_id: int, categorias: List[str]):
+def asignar_categorias(conn, tarea_id: int, categorias: List[int]):
     cur = conn.cursor()
-    # Eliminar categorías previas
     cur.execute("DELETE FROM TareasCategorias WHERE tarea_id = ?", (tarea_id,))
-    # Insertar nuevas categorías
-    for cat in categorias:
-        # obtener id de la categoría
-        cur.execute("SELECT id FROM Categorias WHERE nombre = ?", (cat,))
-        row = cur.fetchone()
-        if row:
-            cat_id = row[0]
-            cur.execute(
-                "INSERT INTO TareasCategorias (tarea_id, categoria_id) VALUES (?, ?)",
-                (tarea_id, cat_id)
-            )
+    for cat_id in categorias:
+        cur.execute(
+            "INSERT INTO TareasCategorias (tarea_id, categoria_id) VALUES (?, ?)",
+            (tarea_id, cat_id)
+        )
 
 # --- Marcar Tarea como Completada ---
 @app.patch("/tareas/{usuario_id}/{tarea_id}/completada")
@@ -253,8 +272,3 @@ def marcar_completada(usuario_id: int, tarea_id: int, completada: bool):
     conn.commit()
     conn.close()
     return {"mensaje": "Tarea actualizada", "completada": completada}
-
-# --- HTML principal ---
-@app.get("/")
-def index():
-    return FileResponse(os.path.join(".", "index.html"))
