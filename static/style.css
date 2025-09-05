@@ -347,6 +347,166 @@ body {
   transform: translateX(0);
 }
 
+/* === MODAL DE EDICIÓN === */
+.confirm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 15, 15, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.confirm-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  animation: fadeIn 0.3s ease;
+  font-family: "Inter", sans-serif;
+}
+
+.confirm-modal h3 {
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+/* Inputs */
+.confirm-modal input,
+.confirm-modal textarea,
+.confirm-modal select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  transition: border 0.2s ease;
+}
+
+.confirm-modal input:focus,
+.confirm-modal textarea:focus,
+.confirm-modal select:focus {
+  border-color: #3085d6;
+  outline: none;
+}
+
+/* Actions */
+.confirm-modal .actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.confirm-modal button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.confirm-modal button[type="submit"] {
+  background: #3085d6;
+  color: #fff;
+  font-weight: 500;
+}
+
+.confirm-modal button[type="submit"]:hover {
+  background: #1d6cb5;
+}
+
+.confirm-modal #cancelarEditar {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.confirm-modal #cancelarEditar:hover {
+  background: #c0392b;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --- Tareas completadas --- */
+.tarea.completada h3,
+.tarea.completada p,
+.tarea.completada small {
+    text-decoration: line-through; /* Tachar texto */
+    color: #999; /* Gris tenue */
+    opacity: 0.7;
+}
+
+.tarea.completada {
+    background-color: rgba(252, 242, 242, 0.697); /* Fondo más tenue */
+    transition: all 0.3s ease;
+}
+
+/* Checkbox personalizado (opcional) */
+.check-completada {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* Select de prioridades */
+select[name="prioridad"] {
+    background-color: rgba(255, 255, 255, 0.1);  /* Fondo blanco para que se vea el texto */
+    color: #ffffff;             /* Texto oscuro */
+}
+
+select[name="prioridad"] option {
+    background-color: rgba(230, 170, 234, 0.39);  /* Fondo blanco de cada opción */
+    color: #222;             /* Texto de las opciones */
+}
+
+select[name="prioridad"]:focus {
+    outline: 2px solid rgba(165, 34, 197, 0.5);
+    background-color: #dcafdbb1;
+}
+
+/* Select de búsqueda de completadas */
+#buscarCompletada {
+    background-color: rgba(255, 255, 255, 0.1);  /* Fondo semi-transparente */
+    color: #ffffff;                              /* Texto visible */
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 8px 12px;
+    font-size: 14px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    transition: background-color 0.3s ease;
+}
+
+#buscarCompletada option {
+    background-color: rgba(230, 170, 234, 0.39);  /* Fondo de cada opción */
+    color: #222;                                  /* Texto de las opciones */
+    padding: 5px 10px;
+}
+
+#buscarCompletada:focus {
+    outline: 2px solid rgba(165, 34, 197, 0.5);
+    background-color: #dcafdbb1;
+}
+
+
+
 /* Responsive */
 @media (max-width: 1024px) {
   .content-grid {

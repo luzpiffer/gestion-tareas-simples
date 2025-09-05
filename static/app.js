@@ -296,6 +296,7 @@ async function editarTareaForm(tarea) {
     });
 }
 
+
 // --- Inicial ---
 cargarCategorias();
 cargarEstados();
