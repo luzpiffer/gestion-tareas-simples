@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,6 +15,7 @@
     <!-- Estilos -->
     <link rel="stylesheet" href="/static/style.css">
 </head>
+
 <body>
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -40,8 +42,8 @@
                 <div class="glass-card">
                     <h3>Crear Nueva Tarea</h3>
                     <form id="formTarea">
-                        <input type="text" name="titulo" placeholder="Título" required>
-                        <textarea name="descripcion" placeholder="Descripción"></textarea>
+                        <input type="text" name="titulo" minlength="3" maxlength="50" placeholder="Título" required>
+                        <textarea name="descripcion" minlength="5" maxlength="200" placeholder="Descripción"></textarea>
                         <select name="prioridad" required>
                             <option value="" disabled selected>Prioridad</option>
                             <option value="baja">Baja</option>
@@ -83,14 +85,15 @@
             </section>
         </div>
 
-        
+
 
     </main>
 
-        <!-- Notificación -->
+    <!-- Notificación -->
     <div id="notificaciones" class="notificaciones"></div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/2.4.0/purify.min.js"></script>
     <script src="/static/app.js"></script>
 </body>
-</html>
 
+</html>

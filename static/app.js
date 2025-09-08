@@ -46,7 +46,7 @@ async function cargarCategorias() {
     categoriasGlobal.forEach(cat => {
         const option = document.createElement("option");
         option.value = cat.id; // Guardamos ID
-        option.textContent = cat.nombre;
+        option.textContent = DOMPurify.sanitize(cat.nombre); // Sanitizamos nombres
         selectNueva.appendChild(option);
     });
 }
@@ -61,7 +61,7 @@ async function cargarEstados() {
     estados.forEach(e => {
         const option = document.createElement("option");
         option.value = e.id;
-        option.textContent = e.nombre;
+        option.textContent = DOMPurify.sanitize(e.nombre);
         select.appendChild(option);
     });
 }
@@ -87,7 +87,6 @@ function mostrarTareas(tareas) {
         return;
     }
 
-
     tareas.forEach(t => {
         const tareaDiv = document.createElement("div");
         tareaDiv.classList.add("tarea", t.prioridad || "baja");
@@ -97,9 +96,9 @@ function mostrarTareas(tareas) {
             <input type="checkbox" class="check-completada" ${t.completada ? "checked" : ""}>
             <span class="cerrar" title="Eliminar tarea">✖</span>
             <span class="editar" title="Editar tarea">✏️</span>
-            <h3>${t.titulo} <small>(${t.prioridad || "Baja"})</small></h3>
-            <p>${t.descripcion || "Sin descripción"}</p>
-            <small>📅 Vence: ${t.fecha_vencimiento || "N/A"}</small>
+            <h3>${DOMPurify.sanitize(t.titulo)} <small>(${DOMPurify.sanitize(t.prioridad || "Baja")})</small></h3>
+            <p>${DOMPurify.sanitize(t.descripcion || "Sin descripción")}</p>
+            <small>📅 Vence: ${DOMPurify.sanitize(t.fecha_vencimiento || "N/A")}</small>
         `;
 
         // Completar
@@ -121,7 +120,6 @@ function mostrarTareas(tareas) {
             confirmarEliminar(t.id);
         });
 
-
         // Editar
         tareaDiv.querySelector(".editar").addEventListener("click", () => {
             editarTareaForm(t);
@@ -137,12 +135,46 @@ document.getElementById("formTarea").addEventListener("submit", async e => {
     if (!currentUser) return;
 
     const data = Object.fromEntries(new FormData(e.target).entries());
-    const categoriasIds = Array.from(e.target.querySelector('[name="categorias"]').selectedOptions).map(o => parseInt(o.value));
-    data.usuario_id = currentUser.id;
-    data.categorias = categoriasIds;
 
-    // Convertir prioridad a valor por defecto si está vacío
-    if (!data.prioridad) data.prioridad = "baja";
+    // Validar prioridad
+    const prioridad = data.prioridad || "baja";
+    if (!["baja","media","alta"].includes(prioridad)) {
+        mostrarNotificacion("Seleccione una prioridad válida ❌", "error");
+        return;
+    }
+    data.prioridad = prioridad;
+
+    // Validar categorías seleccionadas
+    const categoriasIds = Array.from(e.target.querySelector('[name="categorias"]').selectedOptions)
+        .map(o => parseInt(o.value))
+        .filter(id => categoriasGlobal.some(c => c.id === id));
+
+    if (categoriasIds.length === 0) {
+        mostrarNotificacion("Seleccione al menos una categoría válida ❌", "error");
+        return;
+    }
+    data.categorias = categoriasIds;
+    data.usuario_id = currentUser.id;
+
+    // Sanitización
+    data.titulo = DOMPurify.sanitize(data.titulo);
+    data.descripcion = DOMPurify.sanitize(data.descripcion);
+
+    // Validaciones de longitud
+    if (data.titulo.length < 3 || data.titulo.length > 50) {
+        mostrarNotificacion("El título debe tener entre 3 y 50 caracteres ❌", "error");
+        return;
+    }
+    if (data.descripcion && data.descripcion.length > 200) {
+        mostrarNotificacion("La descripción no puede superar los 200 caracteres ❌", "error");
+        return;
+    }
+
+    // Fecha mínima
+    if (data.fecha_vencimiento < hoy) {
+        mostrarNotificacion("La fecha no puede ser en el pasado ❌", "error");
+        return;
+    }
 
     console.log("📤 Enviando tarea:", data);
 
@@ -161,141 +193,6 @@ document.getElementById("formTarea").addEventListener("submit", async e => {
         mostrarNotificacion(err.detail || "Error al agregar ❌", "error");
     }
 });
-
-// --- Buscar ---
-async function buscar() {
-    if (!currentUser) return;
-
-    const titulo = document.getElementById("buscarTitulo").value.trim();
-    const fecha = document.getElementById("buscarFecha").value;
-    const completada = document.getElementById("buscarCompletada").value;
-
-    const params = new URLSearchParams();
-    if (titulo) params.append("titulo", titulo);
-    if (fecha) params.append("fecha", fecha);
-    if (completada !== "") params.append("completada", completada);
-
-    const res = await fetch(`${API}/${currentUser.id}?${params.toString()}`);
-    if (!res.ok) {
-        mostrarNotificacion("Error al buscar tareas ❌", "error");
-        return;
-    }
-    const tareas = await res.json();
-    mostrarTareas(Array.isArray(tareas) ? tareas : []);
-}
-
-// --- Limpiar búsqueda ---
-function limpiarBusqueda() {
-    document.getElementById("buscarTitulo").value = "";
-    document.getElementById("buscarFecha").value = "";
-    cargarTareas();
-}
-
-// --- Confirmar eliminar ---
-async function confirmarEliminar(idTarea) {
-    const result = await Swal.fire({
-        title: '¿Estás seguro?',
-        text: "No podrás revertir esto",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar'
-    });
-
-    if (result.isConfirmed) {
-        try {
-            const res = await fetch(`${API}/${currentUser.id}/${idTarea}`, { method: "DELETE" });
-            if (res.ok) {
-                Swal.fire('Eliminado!', 'La tarea ha sido eliminada.', 'success');
-                cargarTareas(); // recarga la lista actualizada
-            } else {
-                const error = await res.json();
-                Swal.fire('Error', error.detail || 'No se pudo eliminar la tarea.', 'error');
-            }
-        } catch (err) {
-            Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
-        }
-    }
-}
-
-// --- Editar tarea ---
-async function editarTareaForm(tarea) {
-    const overlay = document.createElement("div");
-    overlay.className = "confirm-modal-overlay";
-    const modal = document.createElement("div");
-    modal.className = "confirm-modal";
-    modal.innerHTML = `
-        <h3>Editar tarea</h3>
-        <form id="formEditar">
-            <input type="text" name="titulo" value="${tarea.titulo}" required>
-            <textarea name="descripcion">${tarea.descripcion || ""}</textarea>
-            <select name="prioridad" required>
-                <option value="baja" ${tarea.prioridad === "baja" ? "selected" : ""}>Baja</option>
-                <option value="media" ${tarea.prioridad === "media" ? "selected" : ""}>Media</option>
-                <option value="alta" ${tarea.prioridad === "alta" ? "selected" : ""}>Alta</option>
-            </select>
-            <input type="date" id="fechaEditar" name="fecha_vencimiento" value="${tarea.fecha_vencimiento}" required>
-            <div class="actions">
-                <button type="submit">Guardar</button>
-                <button type="button" id="cancelarEditar">Cancelar</button>
-            </div>
-        </form>
-    `;
-    document.body.appendChild(overlay);
-    overlay.appendChild(modal);
-
-    const fechaEditarInput = document.getElementById("fechaEditar");
-    fechaEditarInput.min = hoy;
-
-    // Categorías
-    const selectCategorias = document.createElement("select");
-    selectCategorias.name = "categorias";
-    selectCategorias.multiple = true;
-    categoriasGlobal.forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat.id;
-        option.textContent = cat.nombre;
-        if (tarea.categorias_ids?.includes(cat.id)) option.selected = true;
-        selectCategorias.appendChild(option);
-    });
-    modal.querySelector("form").insertBefore(selectCategorias, fechaEditarInput);
-
-    document.getElementById("cancelarEditar").addEventListener("click", () => overlay.remove());
-
-    document.getElementById("formEditar").addEventListener("submit", async e => {
-        e.preventDefault();
-        const data = Object.fromEntries(new FormData(e.target).entries());
-        data.usuario_id = currentUser.id;
-        const categoriasIds = Array.from(e.target.querySelector('[name="categorias"]').selectedOptions).map(o => parseInt(o.value));
-        data.categorias = categoriasIds;
-
-        if (!data.titulo.trim()) {
-            mostrarNotificacion("El título es obligatorio ❌", "error");
-            return;
-        }
-        if (data.fecha_vencimiento < hoy) {
-            mostrarNotificacion("La fecha no puede ser en el pasado ❌", "error");
-            return;
-        }
-
-        const res = await fetch(`${API}/${currentUser.id}/${tarea.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        });
-
-        if (res.ok) {
-            mostrarNotificacion("Tarea actualizada ✅");
-            cargarTareas();
-        } else {
-            mostrarNotificacion("Error al editar ❌", "error");
-        }
-        overlay.remove();
-    });
-}
-
 
 // --- Inicial ---
 cargarCategorias();

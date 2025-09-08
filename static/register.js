@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // --- Funcionalidad de mostrar/ocultar contraseña ---
     document.querySelectorAll('.toggle-password').forEach(icon => {
-        icon.addEventListener('click', function() {
+        icon.addEventListener('click', function () {
             const input = this.parentElement.querySelector('input');
             if (input.type === 'password') {
                 input.type = 'text';
@@ -78,13 +78,13 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
         cont.appendChild(div);
-        
+
         // Animación de entrada
         setTimeout(() => {
             div.style.opacity = '1';
             div.style.transform = 'translateX(0)';
         }, 10);
-        
+
         // Eliminar después de 3.5 segundos
         setTimeout(() => {
             div.style.opacity = '0';
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
             max-width: 400px;
         `;
         document.body.appendChild(cont);
-        
+
         // Agregar estilos CSS para las notificaciones
         if (!document.getElementById('notification-styles')) {
             const style = document.createElement('style');
@@ -146,26 +146,25 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
             document.head.appendChild(style);
         }
-        
+
         return cont;
     }
 
     // --- Registro ---
     const formRegister = document.getElementById("registroForm");
     if (formRegister) {
-        formRegister.addEventListener("submit", async function(e) {
+        formRegister.addEventListener("submit", async function (e) {
             e.preventDefault();
-            
-            const username = document.getElementById("regUsername").value;
-            const password = document.getElementById("regPassword").value;
 
-            if (!username.trim() || !password.trim()) {
-                mostrarNotificacion("Todos los campos son obligatorios", "error");
+            const usernameRegex = /^[a-zA-Z0-9]{4,15}$/;
+            const passwordRegex = /^(?=.*[0-9]).{6,}$/;
+
+            if (!usernameRegex.test(regUsername.value)) {
+                mostrarNotificacion("Usuario inválido ❌", "error");
                 return;
             }
-
-            if (password.length < 4) {
-                mostrarNotificacion("La contraseña debe tener al menos 4 caracteres", "error");
+            if (!passwordRegex.test(regPassword.value)) {
+                mostrarNotificacion("Contraseña inválida ❌", "error");
                 return;
             }
 
@@ -180,9 +179,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (res.ok) {
                     // Guardar usuario completo
-                    localStorage.setItem("currentUser", JSON.stringify({ 
-                        id: result.id, 
-                        username: result.username 
+                    localStorage.setItem("currentUser", JSON.stringify({
+                        id: result.id,
+                        username: result.username
                     }));
                     mostrarNotificacion("Registro exitoso! Redirigiendo...", "exito");
                     setTimeout(() => {
@@ -201,9 +200,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // --- Login ---
     const formLogin = document.getElementById("loginForm");
     if (formLogin) {
-        formLogin.addEventListener("submit", async function(e) {
+        formLogin.addEventListener("submit", async function (e) {
             e.preventDefault();
-            
+
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
 
@@ -223,9 +222,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (res.ok) {
                     // Guardar usuario completo
-                    localStorage.setItem("currentUser", JSON.stringify({ 
-                        id: result.id, 
-                        username: result.username 
+                    localStorage.setItem("currentUser", JSON.stringify({
+                        id: result.id,
+                        username: result.username
                     }));
                     mostrarNotificacion("Login exitoso! Redirigiendo...", "exito");
                     setTimeout(() => {
@@ -242,7 +241,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // --- Responsive behavior ---
-    window.addEventListener("resize", function() {
+    window.addEventListener("resize", function () {
         if (window.innerWidth > 850) {
             // Reset styles for desktop
             cajaTrasera.style.left = "";

@@ -1,59 +1,61 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestor de Tareas - Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de Tareas - Login</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="/static/register.css">
+  <link rel="stylesheet" href="/static/register.css">
 </head>
+
 <body>
-    <!-- Added animated background particles -->
-    <div class="particles">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-    </div>
+  <!-- Added animated background particles -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
 
-    <main>
-        <div class="contenedor__todo">
-            <div class="caja__trasera">
-                <div class="caja__trasera-login">
-                    <!-- Added icons and improved content -->
-                    <div class="icon-container">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
-                    <h3>¡Bienvenido de vuelta!</h3>
-                    <p>Inicia sesión para acceder a tu cuenta y disfrutar de todas nuestras funciones</p>
-                    <button id="btn__iniciar-sesion">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Iniciar Sesión
-                    </button>
-                </div>
-                <div class="caja__trasera-register">
-                    <div class="icon-container">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <h3>¡Únete a nosotros!</h3>
-                    <p>Crea tu cuenta y descubre un mundo de posibilidades esperándote</p>
-                    <button id="btn__registrarse">
-                        <i class="fas fa-rocket"></i>
-                        Regístrarse
-                    </button>
-                </div>
-            </div>
+  <main>
+    <div class="contenedor__todo">
+      <div class="caja__trasera">
+        <div class="caja__trasera-login">
+          <!-- Added icons and improved content -->
+          <div class="icon-container">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <h3>¡Bienvenido de vuelta!</h3>
+          <p>Inicia sesión para acceder a tu cuenta y disfrutar de todas nuestras funciones</p>
+          <button id="btn__iniciar-sesion">
+            <i class="fas fa-sign-in-alt"></i>
+            Iniciar Sesión
+          </button>
+        </div>
+        <div class="caja__trasera-register">
+          <div class="icon-container">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <h3>¡Únete a nosotros!</h3>
+          <p>Crea tu cuenta y descubre un mundo de posibilidades esperándote</p>
+          <button id="btn__registrarse">
+            <i class="fas fa-rocket"></i>
+            Regístrarse
+          </button>
+        </div>
+      </div>
 
-            <!--Formulario de Login y registro-->
-            <div class="contenedor__login-register">
-            <!-- Login -->
+      <!--Formulario de Login y registro-->
+      <div class="contenedor__login-register">
+        <!-- Login -->
         <form id="loginForm" class="formulario__login">
           <div class="form-header">
             <div class="form-icon">
@@ -89,12 +91,12 @@
 
           <div class="input-group">
             <i class="fas fa-user"></i>
-            <input id="regUsername" type="text" placeholder="Nombre" required>
+            <input id="regUsername" type="text" pattern="^[a-zA-Z0-9]{4,15}$" placeholder="Nombre" required>
           </div>
 
           <div class="input-group">
             <i class="fas fa-lock"></i>
-            <input id="regPassword" type="password" placeholder="Contraseña" required>
+            <input id="regPassword" type="password" pattern="^(?=.*[0-9]).{6,}$" placeholder="Contraseña" required>
             <i class="fas fa-eye toggle-password"></i>
           </div>
 
@@ -102,10 +104,11 @@
             Crear Cuenta.. <i class="fas fa-rocket"></i>
           </button>
         </form>
-            </div>
-        </div>
-    </main>
+      </div>
+    </div>
+  </main>
 
-    <script src="/static/register.js"></script>
+  <script src="/static/register.js"></script>
 </body>
+
 </html>
