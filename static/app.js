@@ -1,12 +1,11 @@
-const API = "/tareas";
-let currentUser = JSON.parse(localStorage.getItem("currentUser")); // Debe guardar {id, username}
-
-// --- Verificar login ---
-if (!currentUser) {
+const API = "/tareas"; //---ruta donde la aplicación pide los datos de las tareas al servidor.--
+let currentUser = JSON.parse(localStorage.getItem("currentUser")); // busca en el navegador si hay un usuario guardado (cuando haces login).
+// --- Verificar login. Si no hay usuario logueado, te redirige a register.html ---
+if (!currentUser) { 
     window.location.href = "register.html";
 }
 
-// --- Notificaciones ---
+// --- Notificaciones --- Crea un div con un mensaje. Le pone una clase (exito o error)
 function mostrarNotificacion(mensaje, tipo = "exito") {
     const cont = document.getElementById("notificaciones") || createNotificationContainer();
     const div = document.createElement("div");
@@ -23,7 +22,7 @@ function createNotificationContainer() {
     return cont;
 }
 
-// --- Logout ---
+// --- Logout --- Cerrar sesión, se borra el usuario guardado y te manda a la página de registro.
 document.getElementById("logoutBtn").addEventListener("click", () => {
     localStorage.removeItem("currentUser");
     window.location.href = "register.html";
@@ -31,8 +30,8 @@ document.getElementById("logoutBtn").addEventListener("click", () => {
 
 // --- Fecha mínima ---
 const fechaInput = document.getElementById("fecha_vencimiento");
-const hoy = new Date().toISOString().split("T")[0];
-fechaInput.min = hoy;
+const hoy = new Date().toISOString().split("T")[0]; //obtiene la fecha de hoy y la convierte en formato YYYY-MM-DD
+fechaInput.min = hoy; //hace que no puedas elegir una fecha pasada en el formulario.
 
 // --- Cargar categorías ---
 let categoriasGlobal = []; // Guardaremos todas las categorías con ID y nombre
@@ -66,7 +65,7 @@ async function cargarEstados() {
     });
 }
 
-// --- Cargar tareas ---
+// --- Cargar tareas --- Pide al servidor las tareas del usuario logueado.
 async function cargarTareas() {
     if (!currentUser) return;
     const res = await fetch(`${API}/${currentUser.id}`);
@@ -129,7 +128,7 @@ function mostrarTareas(tareas) {
     });
 }
 
-// --- Crear tarea ---
+// --- Crear tarea --- Valida los datos (titulo, descripción, fecha). Los envía al servidor con fetch (POST)
 document.getElementById("formTarea").addEventListener("submit", async e => {
     e.preventDefault();
     if (!currentUser) return;
@@ -157,8 +156,8 @@ document.getElementById("formTarea").addEventListener("submit", async e => {
     data.usuario_id = currentUser.id;
 
     // Sanitización
-    data.titulo = DOMPurify.sanitize(data.titulo);
-    data.descripcion = DOMPurify.sanitize(data.descripcion);
+    data.titulo = DOMPurify.sanitize(data.titulo); //texto que el usuario ingresó en el campo título.
+    data.descripcion = DOMPurify.sanitize(data.descripcion); //toma ese texto y lo "purifica"
 
     // Validaciones de longitud
     if (data.titulo.length < 3 || data.titulo.length > 50) {
