@@ -5,6 +5,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const formularioRegister = document.querySelector(".formulario__register");
     const contenedorLoginRegister = document.querySelector(".contenedor__login-register");
     const cajaTrasera = document.querySelector(".caja__trasera");
+    
+
 
     // --- Event listeners para cambiar entre formularios ---
     if (btnIniciarSesion) {
@@ -151,55 +153,53 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // --- Registro ---
-    const formRegister = document.getElementById("registroForm");
-    if (formRegister) {
-        formRegister.addEventListener("submit", async function (e) {
-            e.preventDefault();
+  const formRegister = document.getElementById("registroForm");
+  if (formRegister) {
+    formRegister.addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-            // CAPTURA CORRECTA DE VALORES
-            const username = document.getElementById("regUsername").value;
-            const password = document.getElementById("regPassword").value;
+      const username = document.getElementById("regUsername").value.trim();
+      const password = document.getElementById("regPassword").value.trim();
 
-            const usernameRegex = /^[a-zA-Z0-9]{4,15}$/;
-            const passwordRegex = /^(?=.*[0-9]).{6,}$/;
+      const usernameRegex = /^[a-zA-Z0-9]{4,15}$/;
+      const passwordRegex = /^(?=.*[0-9]).{6,}$/;
 
-            if (!usernameRegex.test(username)) {
-                mostrarNotificacion("Usuario inválido ❌", "error");
-                return;
-            }
-            if (!passwordRegex.test(password)) {
-                mostrarNotificacion("Contraseña inválida ❌", "error");
-                return;
-            }
+      if (!usernameRegex.test(username)) {
+        mostrarNotificacion("Usuario inválido ❌", "error");
+        return;
+      }
+      if (!passwordRegex.test(password)) {
+        mostrarNotificacion("Contraseña inválida ❌", "error");
+        return;
+      }
 
-            try {
-                const res = await fetch(`${API_USERS}/register`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const result = await res.json();
-
-                if (res.ok) {
-                    // Guardar usuario completo
-                    localStorage.setItem("currentUser", JSON.stringify({
-                        id: result.id,
-                        username: result.username
-                    }));
-                    mostrarNotificacion("Registro exitoso! Redirigiendo...", "exito");
-                    setTimeout(() => {
-                        window.location.href = "/index.html";
-                    }, 2000);
-                } else {
-                    mostrarNotificacion(result.detail || "Error al registrar", "error");
-                }
-            } catch (err) {
-                console.error("Error:", err);
-                mostrarNotificacion("Error al conectar con el servidor", "error");
-            }
+      try {
+        const res = await fetch(`${API_USERS}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
         });
-    }
+
+        // FastAPI siempre responde JSON (ok o error)
+        const result = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem(
+            "currentUser",
+            JSON.stringify({ id: result.id, username: result.username })
+          );
+          mostrarNotificacion("¡Registro exitoso! Redirigiendo...", "exito");
+          setTimeout(() => (window.location.href = "/index.html"), 1500);
+        } else {
+          // 400 por usuario existente, 422 por payload inválido, etc.
+          mostrarNotificacion(result.detail || "Error al registrar", "error");
+        }
+      } catch (err) {
+        console.error("Error:", err);
+        mostrarNotificacion("Error al conectar con el servidor", "error");
+      }
+    });
+  }
 
     // --- Login ---
     const formLogin = document.getElementById("loginForm");

@@ -19,7 +19,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # --- Conexión a SQL Server ---
 CONNECTION_STRING = (
     "DRIVER={ODBC Driver 17 for SQL Server};"
-    "SERVER=LAPTOP-I85C1DHM;"
+    "SERVER=DANA\SQLEXPRESS;"
     "DATABASE=GestorTareas;"
     "Trusted_Connection=yes;"
 )
