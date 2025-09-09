@@ -156,18 +156,14 @@ document.addEventListener("DOMContentLoaded", function () {
         formRegister.addEventListener("submit", async function (e) {
             e.preventDefault();
 
-            // CAPTURA CORRECTA DE VALORES
-            const username = document.getElementById("regUsername").value;
-            const password = document.getElementById("regPassword").value;
-
             const usernameRegex = /^[a-zA-Z0-9]{4,15}$/;
             const passwordRegex = /^(?=.*[0-9]).{6,}$/;
 
-            if (!usernameRegex.test(username)) {
+            if (!usernameRegex.test(regUsername.value)) {
                 mostrarNotificacion("Usuario inválido ❌", "error");
                 return;
             }
-            if (!passwordRegex.test(password)) {
+            if (!passwordRegex.test(regPassword.value)) {
                 mostrarNotificacion("Contraseña inválida ❌", "error");
                 return;
             }
